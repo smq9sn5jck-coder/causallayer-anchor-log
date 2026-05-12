@@ -1,0 +1,62 @@
+name: Verify
+
+# Public-trust infrastructure health check.
+#
+# Runs on every push, every pull request, and on a daily cron (07:00 UTC,
+# i.e. ~7 hours after the nominal midnight-UTC anchor cadence — well inside
+# the 26-hour freshness grace window).
+#
+# What it asserts is documented in scripts/health-check.js. Failure of this
+# workflow on the main branch is a public signal that one of the invariants
+# in STATUS.md has been broken and must be investigated before any further
+# anchors are committed.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 07:00 UTC every day. Daily cron is required so freshness regressions
+    # surface even if no human pushes for several days.
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  health-check:
+    name: Public-trust infrastructure health check
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run health check
+        run: node scripts/health-check.js
+
+      - name: Run standalone verifier on every existing anchor
+        run: |
+          shopt -s nullglob
+          anchors=(anchors/*.json)
+          if [ ${#anchors[@]} -eq 0 ]; then
+            echo "No anchors yet (pre-genesis) — skipping per-anchor verifier run."
+            exit 0
+          fi
+          fail=0
+          for f in "${anchors[@]}"; do
+            echo "::group::Verifying $f"
+            if ! node scripts/verify-anchor.js "$f"; then
+              echo "::error::standalone verifier failed for $f"
+              fail=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $fail
