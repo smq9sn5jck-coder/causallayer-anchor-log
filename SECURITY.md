@@ -16,7 +16,9 @@ a security property. The security properties that matter are:
 1. **Authenticity.** Every published anchor is signed by the canonical
    CausalLayer Ed25519 private key, whose public counterpart is in
    `public-key.pem` (fingerprint:
-   `1a2f842089766a686bec10a061b3fc3d4bd07fcdadbfdf8a3aef7761bac8a954`).
+   `5b7fc9b398b162e4900f43bddf55cda93c8c7d0b1749cc86e0cbb5754582d6e6`;
+   rotated from the prior pre-genesis key on 2026-05-14, see
+   [`KEY-ROTATION-2026-05-14.md`](./KEY-ROTATION-2026-05-14.md)).
 2. **Append-only behaviour.** Anchors are never silently rewritten or
    deleted. Any historical anchor can be re-verified offline.
 3. **Independent timestamping.** Each anchor is OpenTimestamped against
@@ -88,5 +90,9 @@ In the event of suspected private-key compromise:
 4. Anchors signed by the prior key remain verifiable for records dated
    before the rotation date.
 
-The current `public-key.pem` was rotated on 2026-05-13 (PR #3) and
-supersedes any earlier key found in the repository history.
+The current `public-key.pem` was published on 2026-05-14 and supersedes
+any earlier key in the repository history. The 2026-05-13 (PR #3)
+candidate key and the 2026-05-14 production key were both rotated during
+the pre-genesis period, before any authoritative anchor was signed; see
+[`KEY-ROTATION-2026-05-14.md`](./KEY-ROTATION-2026-05-14.md) for the
+contemporaneous post-mortem.

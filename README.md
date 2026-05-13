@@ -117,19 +117,23 @@ fingerprint.txt          SHA-256 fingerprint of the public key (pin this)
 
 ## Key fingerprint (pin this)
 
-> **⚠️ Pre-genesis key rotation notice (May 13, 2026):** This repository was
-> initialised in May 2026 with a *bootstrap* Ed25519 public key while the
+> **⚠️ Pre-genesis key rotation notice (May 13–14, 2026):** This repository
+> was initialised in May 2026 with a *bootstrap* Ed25519 public key while the
 > production signing key was being provisioned. On **May 13, 2026** the
-> bootstrap key was rotated to the production key documented below, *before
-> any signed anchor had ever been published*. The `anchors/` directory was —
-> and at the moment of rotation, remained — empty, so no signed record was
-> orphaned by the rotation. The first signed anchor under the new key will
-> be the genesis record. The rotation commit itself is permanently visible
-> in this repository's history.
+> bootstrap key was rotated to a candidate production key (commit history
+> remains visible). On **May 14, 2026** that candidate was rotated to the
+> current production key as part of operational onboarding of the engine's
+> publication pipeline, *before any signed anchor had ever been published*.
+> The `anchors/` directory was — and at the moment of each rotation,
+> remained — empty, so no signed record was orphaned by any rotation. The
+> first signed anchor under the current key will be the genesis record.
+> Both rotation commits, and the contemporaneous post-mortem
+> [`KEY-ROTATION-2026-05-14.md`](./KEY-ROTATION-2026-05-14.md), are
+> permanently visible in this repository's history.
 >
 > **Pin the fingerprint that is current at the time of the first anchor** —
-> currently `1a2f842089766a686bec10a061b3fc3d4bd07fcdadbfdf8a3aef7761bac8a954`.
-> Do **not** pin any fingerprint from commits dated before May 13, 2026.
+> currently `5b7fc9b398b162e4900f43bddf55cda93c8c7d0b1749cc86e0cbb5754582d6e6`.
+> Do **not** pin any fingerprint from commits dated before 2026-05-14.
 
 The canonical Ed25519 public key fingerprint is published in this repo at
 [`fingerprint.txt`](fingerprint.txt). GitHub's commit history makes silent

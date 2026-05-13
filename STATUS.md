@@ -10,8 +10,8 @@
 
 | Component | Status | Public artifact |
 |---|---|---|
-| Public signing key | **Published** (production key, rotated from bootstrap on 2026-05-13) | [`public-key.pem`](./public-key.pem), [`public-key.jwk.json`](./public-key.jwk.json) |
-| Public key fingerprint | **Published** (`1a2f8420…ac8a954`) | [`fingerprint.txt`](./fingerprint.txt) |
+| Public signing key | **Published** (production key, pre-genesis rotation completed 2026-05-14) | [`public-key.pem`](./public-key.pem), [`public-key.jwk.json`](./public-key.jwk.json) |
+| Public key fingerprint | **Published** (`5b7fc9b3…82d6e6`) | [`fingerprint.txt`](./fingerprint.txt), [`KEY-ROTATION-2026-05-14.md`](./KEY-ROTATION-2026-05-14.md) |
 | Standalone verifier (zero-deps) | **Published** | [`scripts/verify-anchor.js`](./scripts/verify-anchor.js) |
 | Independent verifier package | **Published** | [`causallayer-verifier`](https://github.com/smq9sn5jck-coder/causallayer-verifier) |
 | Genesis declaration | **Published** | [`GENESIS.md`](./GENESIS.md) |
