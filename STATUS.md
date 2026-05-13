@@ -57,6 +57,22 @@ These become verifiable from the genesis anchor onward.
 
 ---
 
+## Operational handover (2026-05-14)
+
+During the genesis period the production private key is being moved out of the
+build sandbox and into permanent custody (offline backup plus a managed secret
+store). Until that handover is complete and the first authoritative anchor has
+been signed, no anchors exist and the published public key has signed nothing.
+This is the same pre-genesis state already documented above, restated here for
+completeness so that any future reader of this file's commit history sees that
+the operational gap was disclosed in real time rather than discovered later.
+
+If a further pre-genesis key rotation becomes necessary as part of completing
+this handover, it will be documented in the same way as the 2026-05-14 rotation
+and will be the last rotation prior to the first authoritative anchor.
+
+---
+
 ## What changes when the genesis anchor lands
 
 The moment the first signed anchor JSON appears in [`anchors/`](./anchors/), three things become
