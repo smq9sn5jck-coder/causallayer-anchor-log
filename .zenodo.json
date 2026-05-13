@@ -1,0 +1,32 @@
+{
+  "title": "CausalLayer Anchor Log",
+  "description": "Public, append-only Merkle anchor log and verification infrastructure for CausalLayer attribution certificates. Contains canonical signing keys, anchor history, in-browser verifier, security policy, and rotation post-mortems. Used to provide tamper-evident, third-party-verifiable timestamps for deterministic AI liability apportionment outputs.",
+  "creators": [
+    {
+      "name": "CausalLayer",
+      "affiliation": "CausalLayer"
+    }
+  ],
+  "keywords": [
+    "ai-safety",
+    "ai-liability",
+    "attribution",
+    "transparency-log",
+    "merkle-tree",
+    "ed25519",
+    "opentimestamps",
+    "causal-inference",
+    "ai-incident-response",
+    "responsible-ai"
+  ],
+  "license": "Apache-2.0",
+  "upload_type": "software",
+  "access_right": "open",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/smq9sn5jck-coder/causallayer-verifier",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ]
+}

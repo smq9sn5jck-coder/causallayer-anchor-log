@@ -1,0 +1,24 @@
+# CausalLayer Anchor Log
+
+> The public, append-only Merkle anchor log for CausalLayer attribution certificates. The canonical place to verify the integrity and timestamp of any attribution certificate produced by the CausalLayer engine.
+
+## Canonical artefacts
+
+- [Public key (PEM)](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/public-key.pem): The Ed25519 public key used to verify all anchor signatures. Fingerprint `5b7fc9b398b162e4900f43bddf55cda93c8c7d0b1749cc86e0cbb5754582d6e6`.
+- [Public key (JWK)](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/public-key.jwk.json): Same key in JSON Web Key form for the in-browser verifier.
+- [Fingerprint](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/fingerprint.txt): SHA-256 of SPKI DER, the value all third-party verifiers should pin.
+- [In-browser verifier](https://smq9sn5jck-coder.github.io/causallayer-anchor-log/): Drop a certificate into the page; verify signature + Merkle inclusion + canonical-key match without trusting any server.
+
+## Key documents
+
+- [README](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/README.md)
+- [Genesis](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/GENESIS.md)
+- [Status](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/STATUS.md)
+- [Security policy](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/SECURITY.md)
+- [Key rotation 2026-05-14](https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/KEY-ROTATION-2026-05-14.md)
+
+## Related repositories
+
+- [Verifier package](https://github.com/smq9sn5jck-coder/causallayer-verifier) — open-source JS library implementing the same verification protocol as the in-browser page.
+- [Attribution Spec v0.1](https://github.com/smq9sn5jck-coder/causallayer-verifier/blob/main/CAUSAL-ATTRIBUTION-SPEC-v0.1.md) — canonical wire format for attribution certificates.
+- [Threat Model](https://github.com/smq9sn5jck-coder/causallayer-verifier/blob/main/THREAT-MODEL.md) — what the verifier proves, what it doesn't, and how an attacker would break it.

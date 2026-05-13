@@ -1,0 +1,6 @@
+Contact: https://github.com/smq9sn5jck-coder/causallayer-anchor-log/security/advisories/new
+Expires: 2027-05-14T00:00:00Z
+Encryption: https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/public-key.pem
+Preferred-Languages: en
+Canonical: https://smq9sn5jck-coder.github.io/causallayer-anchor-log/.well-known/security.txt
+Policy: https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/SECURITY.md
