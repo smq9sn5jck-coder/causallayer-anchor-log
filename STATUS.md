@@ -10,8 +10,8 @@
 
 | Component | Status | Public artifact |
 |---|---|---|
-| Public signing key | **Published** | [`public-key.pem`](./public-key.pem), [`public-key.jwk.json`](./public-key.jwk.json) |
-| Public key fingerprint | **Published** | [`fingerprint.txt`](./fingerprint.txt) |
+| Public signing key | **Published** (production key, rotated from bootstrap on 2026-05-13) | [`public-key.pem`](./public-key.pem), [`public-key.jwk.json`](./public-key.jwk.json) |
+| Public key fingerprint | **Published** (`1a2f8420…ac8a954`) | [`fingerprint.txt`](./fingerprint.txt) |
 | Standalone verifier (zero-deps) | **Published** | [`scripts/verify-anchor.js`](./scripts/verify-anchor.js) |
 | Independent verifier package | **Published** | [`causallayer-verifier`](https://github.com/smq9sn5jck-coder/causallayer-verifier) |
 | Genesis declaration | **Published** | [`GENESIS.md`](./GENESIS.md) |
@@ -28,7 +28,10 @@
 Even without a signed anchor, the following claims are already independently verifiable:
 
 1. **A public Ed25519 key was published before any signed record existed.**
-   Verifiable from the GitHub commit history of this repository.
+   Verifiable from the GitHub commit history of this repository. The key was
+   rotated once on 2026-05-13, prior to any signed record being committed,
+   per the pre-genesis rotation notice in [`README.md`](./README.md). This
+   rotation event is itself a permanent commit in the repository.
 2. **A standalone, zero-dependency verifier was published before any record needed verifying.**
    Verifiable by reading [`scripts/verify-anchor.js`](./scripts/verify-anchor.js) — it has no
    imports beyond Node standard library and makes no network calls back to CausalLayer.
