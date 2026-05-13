@@ -117,19 +117,29 @@ fingerprint.txt          SHA-256 fingerprint of the public key (pin this)
 
 ## Key fingerprint (pin this)
 
-> **⚠️ Bootstrap notice (May 2026):** This repository was initialised with a
-> *development* Ed25519 public key while the production secret was being
-> provisioned. The **first signed anchor commit** will publish the production
-> public key and fingerprint, replacing the bootstrap files. Until that first
-> commit appears under `anchors/`, no signature in this repository should be
-> trusted as authoritative. Once the first authoritative anchor lands, pin
-> the fingerprint shown in that commit; do not pin the bootstrap value.
-
+> **⚠️ Pre-genesis key rotation notice (May 13, 2026):** This repository was
+> initialised in May 2026 with a *bootstrap* Ed25519 public key while the
+> production signing key was being provisioned. On **May 13, 2026** the
+> bootstrap key was rotated to the production key documented below, *before
+> any signed anchor had ever been published*. The `anchors/` directory was —
+> and at the moment of rotation, remained — empty, so no signed record was
+> orphaned by the rotation. The first signed anchor under the new key will
+> be the genesis record. The rotation commit itself is permanently visible
+> in this repository's history.
+>
+> **Pin the fingerprint that is current at the time of the first anchor** —
+> currently `1a2f842089766a686bec10a061b3fc3d4bd07fcdadbfdf8a3aef7761bac8a954`.
+> Do **not** pin any fingerprint from commits dated before May 13, 2026.
 
 The canonical Ed25519 public key fingerprint is published in this repo at
 [`fingerprint.txt`](fingerprint.txt). GitHub's commit history makes silent
-rotation of the fingerprint detectable — if the fingerprint changes, the
-commit that changed it is itself part of the public audit trail.
+rotation of the fingerprint detectable — if the fingerprint changes again
+after the first authoritative anchor lands, that change must be accompanied
+by a `GENESIS-amendment-` commit explaining the reason and a corresponding
+notice in [`STATUS.md`](./STATUS.md). Any rotation after the first signed
+anchor would be a continuity break and must be treated by verifiers as
+requiring explicit acknowledgement before signatures are trusted across the
+break.
 
 If in doubt about authenticity, cross-check the fingerprint against
 out-of-band sources (e.g., a CausalLayer team member's signed message).
