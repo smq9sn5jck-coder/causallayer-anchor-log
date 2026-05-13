@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CausalLayer Anchor Verifier · in-browser, zero-trust</title>
+  <meta name="description" content="Independently verify a CausalLayer signed anchor or attribution certificate in your browser. Open source. No network calls. Uses the W3C Web Cryptography API." />
+  <link rel="canonical" href="https://smq9sn5jck-coder.github.io/causallayer-anchor-log/" />
+  <style>
+    :root {
+      --bg: #0b0c10;
+      --fg: #e6e9ef;
+      --muted: #8b94a7;
+      --ok: #3ddc97;
+      --err: #ff5c7c;
+      --warn: #ffb74d;
+      --card: #13151c;
+      --border: #222637;
+      --accent: #5c8eff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial; background: var(--bg); color: var(--fg); line-height: 1.55; }
+    main { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
+    h1 { font-size: 1.85rem; margin: 0 0 8px; letter-spacing: -0.01em; }
+    h2 { font-size: 1.05rem; margin: 28px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    p { color: var(--muted); }
+    p.lede { color: var(--fg); margin-top: 4px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin: 12px 0; }
+    .card.note { border-color: rgba(255, 183, 77, 0.4); background: rgba(255, 183, 77, 0.05); }
+    textarea { width: 100%; min-height: 200px; background: #0a0b11; color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: ui-monospace, SF Mono, Menlo, monospace; font-size: 12px; resize: vertical; }
+    button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 10px 16px; font-weight: 600; cursor: pointer; font-size: 0.95rem; }
+    button.secondary { background: transparent; border: 1px solid var(--border); color: var(--fg); margin-left: 8px; }
+    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+    .pill.ok { background: rgba(61, 220, 151, 0.15); color: var(--ok); }
+    .pill.err { background: rgba(255, 92, 124, 0.15); color: var(--err); }
+    .pill.warn { background: rgba(255, 183, 77, 0.15); color: var(--warn); }
+    .pill.info { background: rgba(92, 142, 255, 0.15); color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-weight: 500; }
+    code, .mono { font-family: ui-monospace, SF Mono, Menlo, monospace; font-size: 0.85em; color: #a8b1c7; word-break: break-all; }
+    .meta { font-size: 0.85rem; color: var(--muted); margin-top: 18px; }
+    .meta a { color: var(--accent); }
+    a { color: var(--accent); }
+    details { margin-top: 12px; }
+    summary { cursor: pointer; color: var(--accent); font-size: 0.92rem; }
+    .hidden { display: none; }
+    footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CausalLayer Anchor Verifier</h1>
+    <p class="lede">
+      Independently verify a CausalLayer signed anchor or attribution certificate
+      directly in your browser. This page makes no network calls to CausalLayer
+      after the public key is loaded from this same GitHub Pages origin.
+    </p>
+    <p style="margin-top:14px">
+      Open source. View the source of this page at any time with
+      <strong>View Source</strong>, or read it on
+      <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/docs/index.html">GitHub</a>.
+      Verification uses the W3C Web Cryptography API (Ed25519, RFC 8032; SHA-256, FIPS 180-4).
+    </p>
+
+    <div class="card">
+      <h2>1. Canonical public key</h2>
+      <p style="margin:0">
+        Fingerprint (SHA-256 of SPKI DER):
+        <span class="mono" id="fpExpected">loading…</span>
+        <span class="pill info" id="fpStatusPill">checking</span>
+      </p>
+      <p style="margin:6px 0 0">
+        Source files (this same origin):
+        <a href="../public-key.pem">public-key.pem</a> ·
+        <a href="../public-key.jwk.json">public-key.jwk.json</a> ·
+        <a href="../fingerprint.txt">fingerprint.txt</a> ·
+        <a href="../KEY-ROTATION-2026-05-14.md">key-rotation record</a>.
+        The fingerprint is recomputed locally from the PEM bytes and cross-checked
+        against <code>fingerprint.txt</code>; if the two disagree, this page will
+        say so prominently and you should refuse to trust any verification result
+        until the discrepancy is explained.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>2. Paste a signed artefact</h2>
+      <p style="margin:0 0 8px">
+        Paste either a <strong>daily anchor JSON</strong> (from
+        <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/tree/main/anchors">/anchors/</a>)
+        or a <strong>CausalLayer attribution certificate JSON</strong>.
+      </p>
+      <textarea id="artJson" placeholder='Paste anchor JSON or certificate JSON, or drag a .json file in.'></textarea>
+      <div class="row">
+        <button id="verifyBtn">Verify</button>
+        <button class="secondary" id="clearBtn">Clear</button>
+        <input type="file" id="fileInput" accept=".json,application/json" style="display:none" />
+        <button class="secondary" id="loadFileBtn">Load .json file…</button>
+        <button class="secondary" id="loadExampleBtn">Load example (dev-test)</button>
+      </div>
+    </div>
+
+    <div class="card hidden" id="resultCard">
+      <h2>3. Verification result</h2>
+      <div class="row">
+        <span class="pill" id="overallPill">—</span>
+        <span class="pill" id="authPill">—</span>
+        <span class="pill" id="kindPill">—</span>
+        <span class="mono" id="idLine"></span>
+      </div>
+      <table id="checksTable">
+        <thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <details>
+        <summary>Show canonical body that was signed</summary>
+        <pre id="canonicalDump" class="mono" style="white-space:pre-wrap; max-height:280px; overflow:auto; background:#0a0b11; padding:10px; border-radius:6px;"></pre>
+      </details>
+    </div>
+
+    <h2 style="margin-top:36px">What this page verifies, and what it does not</h2>
+    <div class="grid">
+      <div class="card">
+        <p style="color:var(--fg); margin:0 0 6px"><strong>This page verifies</strong></p>
+        <ul style="color:var(--muted); margin:0; padding-left:18px">
+          <li>The Ed25519 signature over the canonical body of an anchor or certificate.</li>
+          <li>That the signing key's fingerprint matches the canonical key published in this same repository.</li>
+          <li>For anchors: that the published Merkle root recomputes from the leaves.</li>
+          <li>That the <em>authoritative</em> flag is true and the algorithm is <code>ed25519</code> (not a dev-only HMAC mode).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p style="color:var(--fg); margin:0 0 6px"><strong>This page does not</strong></p>
+        <ul style="color:var(--muted); margin:0; padding-left:18px">
+          <li>Verify the OpenTimestamps Bitcoin proof — use the
+            <a href="https://github.com/opentimestamps/opentimestamps-client">opentimestamps-client</a>
+            against the <code>.ots</code> file.</li>
+          <li>Validate the <em>substance</em> of an attribution. Cryptographic verification ≠ correctness of fault allocation.</li>
+          <li>Confirm the key has not been compromised after signing. That's a separate
+            <a href="../SECURITY.md">SECURITY policy</a> concern.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card note" id="preGenesisNote">
+      <p style="color:var(--fg); margin:0 0 6px"><strong>Pre-genesis status (as of 2026-05-14).</strong></p>
+      <p style="margin:0; color:var(--muted)">
+        At the time of writing, the public anchor log contains the canonical public
+        key, fingerprint, key-rotation post-mortem, and verifier, but
+        <strong>no authoritative anchors have been signed yet</strong>. The first
+        authoritative anchor will close the genesis period. You can still exercise
+        this page using the &ldquo;Load example (dev-test)&rdquo; button, which loads
+        an anchor signed by a clearly-labelled <em>development</em> key whose
+        fingerprint does not match production. Dev-test anchors are
+        <em>not evidentiary</em> and the result panel will say so.
+      </p>
+    </div>
+
+    <p class="meta">
+      Verifier source: <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/docs/index.html">docs/index.html</a> ·
+      Spec: <a href="https://github.com/smq9sn5jck-coder/causallayer-verifier/blob/main/CAUSAL-ATTRIBUTION-SPEC-v0.1.md">attribution spec v0.1</a> ·
+      Standalone npm package: <a href="https://github.com/smq9sn5jck-coder/causallayer-verifier">causallayer-verifier</a> ·
+      Security policy: <a href="../SECURITY.md">SECURITY.md</a>.
+      To run completely offline, save this page (<em>File → Save As</em>) along with
+      <code>public-key.pem</code> and <code>fingerprint.txt</code> from this repo
+      and open the saved page from disk.
+    </p>
+
+    <footer>
+      Independent verifier — open source, no patent claim asserted on this verifier code itself.
+      The anchor log it consumes is a public append-only record; see
+      <a href="../README.md">README</a> for the trust model.
+    </footer>
+  </main>
+
+  <script>
+  // ─── helpers ───────────────────────────────────────────────────────────
+  const $ = (id) => document.getElementById(id);
+  const setText = (id, v) => { $(id).textContent = v; };
+  const hexToBytes = (hex) => { const b = new Uint8Array(hex.length / 2); for (let i = 0; i < b.length; i++) b[i] = parseInt(hex.substr(i * 2, 2), 16); return b; };
+  const bytesToHex = (bytes) => Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+  const b64ToBytes = (b64) => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const sha256Hex = async (str) => {
+    const data = (str instanceof Uint8Array) ? str : new TextEncoder().encode(str);
+    const buf = await crypto.subtle.digest("SHA-256", data);
+    return bytesToHex(new Uint8Array(buf));
+  };
+  // Canonical JSON — keys sorted at every depth. Matches the spec.
+  function canonicalize(value) {
+    if (value === null || typeof value !== "object") return JSON.stringify(value);
+    if (Array.isArray(value)) return "[" + value.map(canonicalize).join(",") + "]";
+    const keys = Object.keys(value).sort();
+    return "{" + keys.map(k => JSON.stringify(k) + ":" + canonicalize(value[k])).join(",") + "}";
+  }
+  function pemSpkiToRawEd25519(pem) {
+    const b64 = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+    const der = b64ToBytes(b64);
+    return der.slice(der.length - 32);
+  }
+  async function importEd25519PublicKey(pem) {
+    const raw = pemSpkiToRawEd25519(pem);
+    return crypto.subtle.importKey("raw", raw, { name: "Ed25519" }, false, ["verify"]);
+  }
+  // ─── load canonical public key ─────────────────────────────────────────
+  let publicKeyPem = null;
+  let publicKeyFingerprint = null;
+  let publicKeyOk = false;
+  (async () => {
+    try {
+      const [pemRes, fpRes] = await Promise.all([
+        fetch("../public-key.pem"),
+        fetch("../fingerprint.txt"),
+      ]);
+      if (!pemRes.ok || !fpRes.ok) throw new Error(`HTTP ${pemRes.status}/${fpRes.status}`);
+      publicKeyPem = (await pemRes.text()).trim();
+      publicKeyFingerprint = (await fpRes.text()).trim().toLowerCase();
+      const der = b64ToBytes(publicKeyPem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, ""));
+      const localFp = await sha256Hex(der);
+      if (localFp !== publicKeyFingerprint) {
+        setText("fpExpected", `MISMATCH — file says ${publicKeyFingerprint}, recomputed ${localFp}`);
+        const pill = $("fpStatusPill"); pill.textContent = "DO NOT TRUST"; pill.className = "pill err";
+      } else {
+        setText("fpExpected", publicKeyFingerprint);
+        const pill = $("fpStatusPill"); pill.textContent = "fingerprint matches"; pill.className = "pill ok";
+        publicKeyOk = true;
+      }
+    } catch (err) {
+      setText("fpExpected", "Failed to load public key: " + err.message);
+      const pill = $("fpStatusPill"); pill.textContent = "load failed"; pill.className = "pill err";
+    }
+  })();
+  // ─── kind detection ────────────────────────────────────────────────────
+  function detectKind(obj) {
+    if (!obj || typeof obj !== "object") return "unknown";
+    // v0.1 spec anchor
+    if (obj.anchorDate && obj.merkleRoot && obj.payload && Array.isArray(obj.payload.leaves)) return "anchor-v01";
+    // legacy engine certificate
+    if (obj.schemaVersion && obj.integrity && obj.integrity.sectionHashes) return "cert-legacy";
+    // v0.1 spec certificate
+    if (obj.type === "certificate" && obj.signature && obj.anchor && obj.faultAllocation) return "cert-v01";
+    return "unknown";
+  }
+  // ─── verifiers ─────────────────────────────────────────────────────────
+  async function verifyAnchorV01(anc) {
+    const checks = [];
+    const isDevTest = anc.signature && anc.signature.mode === "dev-test";
+    // Schema
+    checks.push({ name: "Schema version", ok: anc.schemaVersion === "0.1", detail: anc.schemaVersion || "(missing)" });
+    // Merkle root
+    const leaves = anc.payload.leaves || [];
+    const recomputed = await merkleRoot(leaves);
+    const merkleOk = recomputed === anc.merkleRoot;
+    checks.push({ name: "Merkle root", ok: merkleOk, detail: merkleOk ? recomputed.slice(0, 32) + "…" : `expected ${anc.merkleRoot}, got ${recomputed}` });
+    // Algorithm + fingerprint
+    const alg = anc.signature && anc.signature.algorithm;
+    const sigFp = (anc.signature && anc.signature.publicKeyFingerprint || "").toLowerCase();
+    checks.push({ name: "Signature algorithm", ok: alg === "Ed25519", detail: alg || "(missing)" });
+    const fpMatchesCanonical = sigFp === publicKeyFingerprint;
+    // In dev-test mode we explicitly allow a non-canonical fingerprint (with inline PEM).
+    if (isDevTest) {
+      checks.push({ name: "Mode", ok: true, detail: "dev-test (signed by an inline ephemeral key; not evidentiary)" });
+    } else {
+      checks.push({ name: "Public-key fingerprint matches canonical", ok: fpMatchesCanonical, detail: fpMatchesCanonical ? sigFp : `anchor says ${sigFp}, canonical is ${publicKeyFingerprint}` });
+    }
+    // Authoritative
+    const authoritative = !isDevTest && anc.signature && anc.signature.authoritative === true && alg === "Ed25519" && fpMatchesCanonical;
+    checks.push({ name: "Authoritative flag", ok: anc.signature && anc.signature.authoritative === true, detail: anc.signature && anc.signature.authoritative === true ? "true" : "false (" + (isDevTest ? "dev-test" : "non-authoritative") + " record)" });
+    // Signature verify — against canonical key for production, inline PEM for dev-test
+    const body = { ...anc };
+    delete body.signature;
+    delete body.payload;
+    const canonical = canonicalize(body);
+    let sigOk = false, sigDetail = "";
+    let verifyAgainst = null;
+    let verifyFp = null;
+    if (isDevTest && anc.signature && anc.signature.publicKeyPem) {
+      try {
+        verifyAgainst = await importEd25519PublicKey(anc.signature.publicKeyPem);
+        // Also recompute fingerprint of inline key and check it matches the embedded fingerprint claim.
+        const inlineDer = b64ToBytes(anc.signature.publicKeyPem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, ""));
+        verifyFp = await sha256Hex(inlineDer);
+        if (verifyFp !== sigFp) {
+          sigDetail = `Inline dev-test PEM fingerprint (${verifyFp}) does not match anchor's stated fingerprint (${sigFp})`;
+          verifyAgainst = null;
+        }
+      } catch (err) {
+        sigDetail = "Failed to import inline dev-test public key: " + err.message;
+      }
+    } else if (!isDevTest && publicKeyOk) {
+      verifyAgainst = await importEd25519PublicKey(publicKeyPem);
+      verifyFp = publicKeyFingerprint;
+    } else if (!isDevTest && !publicKeyOk) {
+      sigDetail = "Canonical public key did not load — cannot verify";
+    }
+    if (alg === "Ed25519" && verifyAgainst && anc.signature && anc.signature.value) {
+      try {
+        const sigBytes = b64ToBytes(anc.signature.value);
+        sigOk = await crypto.subtle.verify("Ed25519", verifyAgainst, sigBytes, new TextEncoder().encode(canonical));
+        if (sigOk) sigDetail = `Ed25519 verified against ${verifyFp.slice(0, 16)}…` + (isDevTest ? " (dev-test key, not evidentiary)" : "");
+        else sigDetail = "Ed25519 signature does NOT verify against canonical body";
+      } catch (err) { sigDetail = "Ed25519 verification error: " + err.message; }
+    }
+    checks.push({ name: "Signature", ok: sigOk, detail: sigDetail });
+    return { kind: isDevTest ? "anchor-v01-dev-test" : "anchor-v01", checks, canonical, authoritative: authoritative && sigOk, id: anc.anchorDate, devTest: isDevTest };
+  }
+  async function merkleRoot(leafStrings) {
+    if (!leafStrings.length) return await sha256Hex(new Uint8Array(0));
+    let layer = await Promise.all(leafStrings.map(s => sha256Hex(s)));
+    while (layer.length > 1) {
+      const next = [];
+      for (let i = 0; i < layer.length; i += 2) {
+        const a = layer[i];
+        const b = i + 1 < layer.length ? layer[i + 1] : a;
+        next.push(await sha256Hex(hexToBytes(a + b)));
+      }
+      layer = next;
+    }
+    return layer[0];
+  }
+  async function verifyCertLegacy(cert) {
+    const checks = [];
+    checks.push({ name: "Schema version", ok: cert.schemaVersion === "1.0.0", detail: cert.schemaVersion || "(missing)" });
+    const now = Date.now();
+    const exp = cert.expiresAt ? new Date(cert.expiresAt).getTime() : Infinity;
+    checks.push({ name: "Not expired", ok: now < exp, detail: cert.expiresAt ? new Date(cert.expiresAt).toISOString() : "no expiry" });
+    let allSectionsOk = true;
+    const sectionDetails = [];
+    for (const sh of (cert.integrity && cert.integrity.sectionHashes || [])) {
+      const sectionData = cert[sh.section] != null ? cert[sh.section] : (cert.integrity && cert.integrity[sh.section]) || null;
+      if (sectionData == null) { allSectionsOk = false; sectionDetails.push(`${sh.section}: missing`); continue; }
+      const recomputed = await sha256Hex(JSON.stringify(sectionData));
+      if (recomputed !== sh.hash) { allSectionsOk = false; sectionDetails.push(`${sh.section}: mismatch`); }
+    }
+    checks.push({ name: "Section hashes", ok: allSectionsOk, detail: allSectionsOk ? `${(cert.integrity && cert.integrity.sectionHashes || []).length} sections verified` : sectionDetails.join("; ") });
+    const recomputedMerkle = await merkleRoot(((cert.integrity && cert.integrity.sectionHashes) || []).map(s => s.hash));
+    const merkleOk = recomputedMerkle === (cert.integrity && cert.integrity.merkleRoot);
+    checks.push({ name: "Merkle root", ok: merkleOk, detail: merkleOk ? cert.integrity.merkleRoot.substring(0, 24) + "…" : `expected ${cert.integrity && cert.integrity.merkleRoot}, got ${recomputedMerkle}` });
+    const alg = cert.integrity && cert.integrity.signatureAlgorithm;
+    const body = {
+      certificateId: cert.certificateId,
+      issuedAt: cert.issuedAt,
+      merkleRoot: cert.integrity && cert.integrity.merkleRoot,
+      sectionHashes: cert.integrity && cert.integrity.sectionHashes,
+      timestampProof: cert.integrity && cert.integrity.timestampProof,
+      type: cert.type,
+      subjectIncidentId: cert.subject && cert.subject.incidentId,
+    };
+    const canonical = canonicalize(body);
+    let sigOk = false, sigDetail = "", authoritative = false;
+    if (alg === "ed25519" && publicKeyOk) {
+      try {
+        const pubKey = await importEd25519PublicKey(publicKeyPem);
+        sigOk = await crypto.subtle.verify("Ed25519", pubKey, hexToBytes(cert.integrity.signature), new TextEncoder().encode(canonical));
+        sigDetail = sigOk ? `Ed25519 verified against ${publicKeyFingerprint.slice(0, 16)}…` : "Ed25519 signature does NOT verify";
+        authoritative = sigOk && (cert.integrity.publicKeyFingerprint || "").toLowerCase() === publicKeyFingerprint;
+      } catch (err) { sigDetail = "Ed25519 verification error: " + err.message; }
+    } else if (alg === "hmac-sha256-dev" || alg === "hmac-sha256") {
+      sigDetail = `Algorithm ${alg} is dev/staging only — not evidentiary.`;
+    } else {
+      sigDetail = `Unknown or non-Ed25519 signatureAlgorithm: ${alg}`;
+    }
+    checks.push({ name: "Signature", ok: sigOk, detail: sigDetail });
+    const allocs = cert.attribution && cert.attribution.allocations || [];
+    const sum = allocs.reduce((s, a) => s + (a.liability || 0), 0);
+    const allocsOk = Math.abs(sum - 1.0) < 0.01;
+    checks.push({ name: "Allocations sum to 1.0", ok: allocsOk, detail: `Σ liability = ${sum.toFixed(4)}` });
+    return { kind: "cert-legacy", checks, canonical, authoritative, id: cert.certificateId };
+  }
+  async function verifyCertV01(cert) {
+    const checks = [];
+    checks.push({ name: "Schema version", ok: cert.version === "0.1", detail: cert.version || "(missing)" });
+    const allocs = cert.faultAllocation || [];
+    const sum = allocs.reduce((s, a) => s + (a.percentage || 0), 0);
+    const allocsOk = Math.abs(sum - 100) < 0.5;
+    checks.push({ name: "Fault allocation sums to 100", ok: allocsOk, detail: `Σ = ${sum.toFixed(2)}` });
+    const alg = cert.signature && cert.signature.algorithm;
+    const sigFp = (cert.signature && cert.signature.publicKeyFingerprint || "").toLowerCase();
+    checks.push({ name: "Signature algorithm", ok: alg === "Ed25519", detail: alg || "(missing)" });
+    const fpMatch = sigFp === publicKeyFingerprint;
+    checks.push({ name: "Public-key fingerprint matches canonical", ok: fpMatch, detail: fpMatch ? sigFp : `cert says ${sigFp}, canonical is ${publicKeyFingerprint}` });
+    const body = { ...cert };
+    delete body.signature;
+    delete body.anchor;
+    const canonical = canonicalize(body);
+    let sigOk = false, sigDetail = "";
+    if (alg === "Ed25519" && publicKeyOk && cert.signature && cert.signature.value) {
+      try {
+        const pubKey = await importEd25519PublicKey(publicKeyPem);
+        const sigBytes = b64ToBytes(cert.signature.value);
+        sigOk = await crypto.subtle.verify("Ed25519", pubKey, sigBytes, new TextEncoder().encode(canonical));
+        sigDetail = sigOk ? `Ed25519 verified against ${publicKeyFingerprint.slice(0, 16)}…` : "Ed25519 signature does NOT verify";
+      } catch (err) { sigDetail = "Ed25519 verification error: " + err.message; }
+    }
+    checks.push({ name: "Signature", ok: sigOk, detail: sigDetail });
+    return { kind: "cert-v01", checks, canonical, authoritative: sigOk && fpMatch, id: cert.incidentId };
+  }
+  // ─── UI wiring ─────────────────────────────────────────────────────────
+  $("verifyBtn").addEventListener("click", async () => {
+    const text = $("artJson").value.trim();
+    if (!text) return alert("Paste an anchor or certificate JSON first.");
+    let obj;
+    try { obj = JSON.parse(text); } catch (e) { return alert("Invalid JSON: " + e.message); }
+    const kind = detectKind(obj);
+    let result;
+    if (kind === "anchor-v01") result = await verifyAnchorV01(obj);
+    else if (kind === "cert-legacy") result = await verifyCertLegacy(obj);
+    else if (kind === "cert-v01") result = await verifyCertV01(obj);
+    else { alert("Unrecognised artefact — expected a v0.1 anchor, v0.1 certificate, or legacy engine certificate."); return; }
+    renderResult(result);
+  });
+  $("clearBtn").addEventListener("click", () => { $("artJson").value = ""; $("resultCard").classList.add("hidden"); });
+  $("loadFileBtn").addEventListener("click", () => $("fileInput").click());
+  $("fileInput").addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) $("artJson").value = await file.text();
+  });
+  document.addEventListener("dragover", (e) => e.preventDefault());
+  document.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) $("artJson").value = await file.text();
+  });
+  $("loadExampleBtn").addEventListener("click", async () => {
+    try {
+      const res = await fetch("example-anchor.json");
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      $("artJson").value = await res.text();
+    } catch (err) { alert("Example unavailable: " + err.message); }
+  });
+  function renderResult(r) {
+    $("resultCard").classList.remove("hidden");
+    setText("idLine", r.id || "");
+    const overall = $("overallPill");
+    const valid = r.checks.every(c => c.ok);
+    overall.textContent = valid ? "VALID" : "INVALID";
+    overall.className = "pill " + (valid ? "ok" : "err");
+    const auth = $("authPill");
+    if (valid && r.authoritative) { auth.textContent = "AUTHORITATIVE"; auth.className = "pill ok"; }
+    else if (valid && r.devTest) { auth.textContent = "NOT EVIDENTIARY (dev-test)"; auth.className = "pill warn"; }
+    else if (valid && !r.authoritative) { auth.textContent = "NOT AUTHORITATIVE"; auth.className = "pill warn"; }
+    else { auth.textContent = "FAILED"; auth.className = "pill err"; }
+    const kindPill = $("kindPill");
+    kindPill.textContent = r.kind;
+    kindPill.className = "pill " + (r.devTest ? "warn" : "info");
+    const tbody = document.querySelector("#checksTable tbody");
+    tbody.innerHTML = "";
+    for (const c of r.checks) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${c.name}</td><td><span class="pill ${c.ok ? "ok" : "err"}">${c.ok ? "PASS" : "FAIL"}</span></td><td><span class="mono">${c.detail}</span></td>`;
+      tbody.appendChild(tr);
+    }
+    $("canonicalDump").textContent = r.canonical;
+  }
+  </script>
+</body>
+</html>

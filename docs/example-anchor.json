@@ -1,0 +1,27 @@
+{
+  "_note": "DEV-TEST anchor signed by an ephemeral key. NOT EVIDENTIARY. Provided only to demonstrate the verifier UI.",
+  "anchorDate": "2026-05-14",
+  "merkleRoot": "f59f5d416a71be24aa85e94b7cd0668b7838f1880518b9e67542aa4201fa72f0",
+  "leafCount": 3,
+  "latestLedgerHash": "921713f8d6e04c9d7ed93efa353fd7c7cff5456a73ccf59a02add464f59d7ab8",
+  "coveredLedgerDates": [
+    "2026-05-14"
+  ],
+  "otsStatus": "not-submitted",
+  "schemaVersion": "0.1",
+  "signature": {
+    "algorithm": "Ed25519",
+    "mode": "dev-test",
+    "publicKeyFingerprint": "ee28a4c73ceb524e0e7920490d9f966d91d007e62a7b215c3f1de95da929d236",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAEfl+gnkKsbUS24PN8g3dsB7G46Bcv5SI2rwAKuIsXpA=\n-----END PUBLIC KEY-----",
+    "value": "Iwcyfogk0Ju2iUJpWpb7euu+BDvbj7n4DoxO+DCZVDIBX5Jx0GkhHZBDSwE8R1k78XKHYOBSEyVGoRJk7oMVAA==",
+    "authoritative": false
+  },
+  "payload": {
+    "leaves": [
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "7b4f44e1a97fbf93a978816a518ac628cafcd95dbe259a628fc181d6b6b97931",
+      "921713f8d6e04c9d7ed93efa353fd7c7cff5456a73ccf59a02add464f59d7ab8"
+    ]
+  }
+}

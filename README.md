@@ -43,7 +43,19 @@ cited at the time the report was issued.
 
 ## How to verify an anchor (no trust in CausalLayer required)
 
-### Option A — Standalone npm package (recommended)
+### Option A — In-browser, zero install
+
+Open <https://smq9sn5jck-coder.github.io/causallayer-anchor-log/> in any
+modern browser. Paste an anchor's JSON (or drag the `.json` file in)
+and click **Verify**. The page runs the W3C Web Cryptography API
+locally, makes no network calls back to CausalLayer, and shows you the
+canonical body it actually hashed, the recomputed Merkle root, the
+signature verification result, and whether the fingerprint matches the
+current canonical key. The page also exposes a labelled `dev-test`
+example so you can exercise the UI before the first authoritative
+anchor lands.
+
+### Option B — Standalone npm package (recommended for automation)
 
 ```bash
 # One-shot via npx (no install)
@@ -60,7 +72,7 @@ package is independent of CausalLayer, has **zero runtime dependencies**
 adversarial vectors covering Merkle tampering, signature forgery, and
 ledger-chain breakage.
 
-### Option B — Command line, no install
+### Option C — Command line, no install
 
 ```bash
 # 1. Pick a date and download its anchor record
@@ -80,7 +92,7 @@ node scripts/verify-anchor.js anchors/2026-05-10.json
 `scripts/verify-anchor.js` has zero CausalLayer dependencies — it's just
 Node's built-in `crypto` module. Read it, audit it, run it.
 
-### Option C — Verify a single accuracy claim
+### Option D — Verify a single accuracy claim
 
 If CausalLayer hands you a report that says *"as of 2026-05-10, our type
 classification accuracy on the public blind-test set was 93%"*, you can:
