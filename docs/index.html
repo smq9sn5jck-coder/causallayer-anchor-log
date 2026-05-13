@@ -75,10 +75,10 @@
       </p>
       <p style="margin:6px 0 0">
         Source files (this same origin):
-        <a href="../public-key.pem">public-key.pem</a> ·
-        <a href="../public-key.jwk.json">public-key.jwk.json</a> ·
-        <a href="../fingerprint.txt">fingerprint.txt</a> ·
-        <a href="../KEY-ROTATION-2026-05-14.md">key-rotation record</a>.
+        <a href="./public-key.pem">public-key.pem</a> ·
+        <a href="./public-key.jwk.json">public-key.jwk.json</a> ·
+        <a href="./fingerprint.txt">fingerprint.txt</a> ·
+        <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/KEY-ROTATION-2026-05-14.md">key-rotation record</a>.
         The fingerprint is recomputed locally from the PEM bytes and cross-checked
         against <code>fingerprint.txt</code>; if the two disagree, this page will
         say so prominently and you should refuse to trust any verification result
@@ -140,7 +140,7 @@
             against the <code>.ots</code> file.</li>
           <li>Validate the <em>substance</em> of an attribution. Cryptographic verification ≠ correctness of fault allocation.</li>
           <li>Confirm the key has not been compromised after signing. That's a separate
-            <a href="../SECURITY.md">SECURITY policy</a> concern.</li>
+            <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/SECURITY.md">SECURITY policy</a> concern.</li>
         </ul>
       </div>
     </div>
@@ -163,7 +163,7 @@
       Verifier source: <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/docs/index.html">docs/index.html</a> ·
       Spec: <a href="https://github.com/smq9sn5jck-coder/causallayer-verifier/blob/main/CAUSAL-ATTRIBUTION-SPEC-v0.1.md">attribution spec v0.1</a> ·
       Standalone npm package: <a href="https://github.com/smq9sn5jck-coder/causallayer-verifier">causallayer-verifier</a> ·
-      Security policy: <a href="../SECURITY.md">SECURITY.md</a>.
+      Security policy: <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/SECURITY.md">SECURITY.md</a>.
       To run completely offline, save this page (<em>File → Save As</em>) along with
       <code>public-key.pem</code> and <code>fingerprint.txt</code> from this repo
       and open the saved page from disk.
@@ -172,7 +172,7 @@
     <footer>
       Independent verifier — open source, no patent claim asserted on this verifier code itself.
       The anchor log it consumes is a public append-only record; see
-      <a href="../README.md">README</a> for the trust model.
+      <a href="https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/README.md">README</a> for the trust model.
     </footer>
   </main>
 
@@ -211,8 +211,8 @@
   (async () => {
     try {
       const [pemRes, fpRes] = await Promise.all([
-        fetch("../public-key.pem"),
-        fetch("../fingerprint.txt"),
+        fetch("./public-key.pem"),
+        fetch("./fingerprint.txt"),
       ]);
       if (!pemRes.ok || !fpRes.ok) throw new Error(`HTTP ${pemRes.status}/${fpRes.status}`);
       publicKeyPem = (await pemRes.text()).trim();
