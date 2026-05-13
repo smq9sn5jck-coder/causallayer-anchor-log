@@ -71,7 +71,7 @@ function loadPublicKey(scriptDir) {
   if (!fs.existsSync(pemPath)) {
     throw new Error(
       `public-key.pem not found at ${pemPath}. Fetch it from ` +
-        "https://faultkey.ai/.well-known/causallayer-cert/public-key.pem"
+        "https://github.com/smq9sn5jck-coder/causallayer-anchor-log/blob/main/public-key.pem"
     );
   }
   return crypto.createPublicKey(fs.readFileSync(pemPath));
