@@ -1,7 +1,7 @@
 # causallayer-anchor-log
 
 > **Tamper-evident, time-stamped, third-party-verifiable witness log** for the
-> [CausalLayer / Faultkey](https://faultkey.ai) AI-liability accuracy ledger.
+> CausalLayer AI-liability engine's daily accuracy ledger.
 
 Every commit in this repository is a daily anchor record committed by the
 CausalLayer engine. Each anchor publicly proves three things, *without
@@ -10,8 +10,8 @@ trusting CausalLayer*:
 1. **Which set of accuracy-ledger entries existed on a given date** — via a
    Merkle root over that day's signed ledger rows.
 2. **That CausalLayer authored the anchor** — via an Ed25519 signature
-   verifiable against the public key published at
-   [`.well-known/causallayer-cert/`](https://faultkey.ai/.well-known/causallayer-cert/public-key.pem).
+   verifiable against the public key published in this repository at
+   [`public-key.pem`](./public-key.pem).
 3. **That the anchor existed at the claimed time** — via an
    [OpenTimestamps](https://opentimestamps.org/) proof anchored in the
    Bitcoin blockchain (typically confirmed within ~3 hours of submission).
@@ -43,24 +43,24 @@ cited at the time the report was issued.
 
 ## How to verify an anchor (no trust in CausalLayer required)
 
-### Option A — In-browser, zero install
+### Option A — Standalone npm package (recommended)
 
-Open the standalone verifier:
-**<https://faultkey.ai/.well-known/causallayer-cert/verify-anchor.html>**
+```bash
+# One-shot via npx (no install)
+npx causallayer-verifier anchors/2026-05-10.json --key ./public-key.pem
 
-Paste any anchor JSON (downloaded from this repo) into the text box. The
-page runs entirely in your browser; it independently:
+# Or install globally
+npm install -g causallayer-verifier
+causallayer-verify anchors/2026-05-10.json
+```
 
-- Recomputes the Merkle root over the included leaves
-- Verifies the Ed25519 signature against the public key fetched from
-  `.well-known/causallayer-cert/public-key.jwk.json`
-- (If present) parses the OpenTimestamps proof and shows the Bitcoin
-  block height it commits to
+The [`causallayer-verifier`](https://github.com/smq9sn5jck-coder/causallayer-verifier)
+package is independent of CausalLayer, has **zero runtime dependencies**
+(only Node's built-in `crypto`), and ships with 40 tests including 36
+adversarial vectors covering Merkle tampering, signature forgery, and
+ledger-chain breakage.
 
-There is no server call back to CausalLayer. View source if you don't
-trust the page itself.
-
-### Option B — Command line
+### Option B — Command line, no install
 
 ```bash
 # 1. Pick a date and download its anchor record
@@ -85,9 +85,8 @@ Node's built-in `crypto` module. Read it, audit it, run it.
 If CausalLayer hands you a report that says *"as of 2026-05-10, our type
 classification accuracy on the public blind-test set was 93%"*, you can:
 
-1. Find the corresponding entry in the daily accuracy ledger (signed,
-   hash-chained — published at
-   <https://faultkey.ai/.well-known/causallayer-cert/ledger/>).
+1. Find the corresponding entry in the daily accuracy ledger — each ledger
+   row hash will be embedded as a Merkle leaf in that day's anchor JSON.
 2. Compute its hash and confirm it appears as a leaf in the Merkle tree
    committed in this repo on 2026-05-10.
 3. Confirm the Bitcoin OTS proof for that anchor — establishing the claim
@@ -109,7 +108,7 @@ anchors/
   ...
 scripts/
   verify-anchor.js       Standalone Node.js verifier (no deps beyond stdlib)
-public-key.pem           Mirror of the canonical key at faultkey.ai
+public-key.pem           Canonical Ed25519 public key (PEM)
 public-key.jwk.json      Same key in JWK form for browser verifiers
 fingerprint.txt          SHA-256 fingerprint of the public key (pin this)
 ```
@@ -127,13 +126,13 @@ fingerprint.txt          SHA-256 fingerprint of the public key (pin this)
 > the fingerprint shown in that commit; do not pin the bootstrap value.
 
 
-The canonical Ed25519 public key fingerprint is published at
-<https://faultkey.ai/.well-known/causallayer-cert/fingerprint.txt> and
-mirrored in this repo at [`fingerprint.txt`](fingerprint.txt).
+The canonical Ed25519 public key fingerprint is published in this repo at
+[`fingerprint.txt`](fingerprint.txt). GitHub's commit history makes silent
+rotation of the fingerprint detectable — if the fingerprint changes, the
+commit that changed it is itself part of the public audit trail.
 
-If those two values ever disagree, **do not trust either** until you've
-confirmed which is correct out-of-band. The anchor-log repo's commit
-history makes silent rotation of the fingerprint detectable.
+If in doubt about authenticity, cross-check the fingerprint against
+out-of-band sources (e.g., a CausalLayer team member's signed message).
 
 ---
 
@@ -152,17 +151,29 @@ history makes silent rotation of the fingerprint detectable.
 
 ---
 
+## What is CausalLayer?
+
+**CausalLayer** is a deterministic causal-attribution engine for AI-liability
+incidents. Given a description of an AI failure, it produces a structured
+allocation of fault across the parties involved, a calibrated damages range,
+and a full auditable causal chain. The engine itself is private and operates
+as a hosted service. **This repository is the public-facing accountability
+layer**: a cryptographic record of accuracy claims the engine makes about
+itself, designed to be auditable by adversaries, regulators, and skeptics
+without any cooperation from CausalLayer.
+
 ## Reporting integrity issues
 
 If you find a discrepancy between an anchor in this repo and what
-CausalLayer claims publicly, please open an issue on this repo or email
-**security@faultkey.ai**. We will treat it as a P0.
+CausalLayer claims publicly, please open a P0 issue:
+<https://github.com/smq9sn5jck-coder/causallayer-anchor-log/issues>.
 
 ---
 
 ## Related
 
-- Public certificate verifier: <https://faultkey.ai/.well-known/causallayer-cert/verify.html>
-- Public anchor verifier: <https://faultkey.ai/.well-known/causallayer-cert/verify-anchor.html>
-- Public accuracy track record: <https://faultkey.ai/track-record>
-- Engine details and methodology: <https://faultkey.ai/whitepaper>
+- Independent verifier package (npm + GitHub):
+  <https://github.com/smq9sn5jck-coder/causallayer-verifier>
+- Genesis declaration: [`GENESIS.md`](./GENESIS.md)
+- Current operational status (what's verifiable today vs. pending):
+  [`STATUS.md`](./STATUS.md)
