@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this anchor log, please cite it as below."
+title: "CausalLayer Anchor Log: Public Ed25519-signed Merkle anchor records for AI-liability attribution certificates"
+abstract: >-
+  This repository is the canonical, append-only, public anchor log for
+  CausalLayer, a deterministic post-incident causal-attribution engine for AI
+  failures. Each anchor is an Ed25519-signed Merkle root over a daily set of
+  attribution-certificate digests, optionally timestamped by OpenTimestamps
+  against the Bitcoin blockchain. The log permits any third party to verify,
+  offline and without trusting CausalLayer, that a given attribution
+  certificate existed in its current form on its asserted date.
+authors:
+  - family-names: Alford
+    given-names: Jarrod
+    affiliation: CausalLayer
+type: dataset
+license: CC0-1.0
+repository-code: "https://github.com/smq9sn5jck-coder/causallayer-anchor-log"
+url: "https://github.com/smq9sn5jck-coder/causallayer-anchor-log"
+keywords:
+  - ai-liability
+  - ai-safety
+  - ai-governance
+  - ai-incident
+  - causal-attribution
+  - merkle-tree
+  - ed25519
+  - opentimestamps
+  - transparency-log
+  - tamper-evident
+date-released: "2026-05-13"
