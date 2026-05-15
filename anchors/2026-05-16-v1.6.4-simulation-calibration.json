@@ -1,0 +1,260 @@
+{
+  "schema": "causallayer.audit-batch.v1",
+  "title": "CausalLayer v1.6.4 \u2014 SIMULATION-ENGINE CALIBRATION DAY (cycles 2-5)",
+  "generated_at": "2026-05-15T23:37:02.667722+00:00",
+  "engine_package_version": "3.1.0",
+  "legal_scorer_doctrinal_version": "1.6.2",
+  "corpus_version": "0.9.1",
+  "corpus_path": "/home/ubuntu/calb2/v09/calb2_v091.json",
+  "leaf_count": 6,
+  "leaves": [
+    {
+      "leaf_index": 1,
+      "leaf_type": "unified_run_summary",
+      "title": "v1.6.4 unified pipeline (cycles 2-5) \u2014 run summary (53 engines \u00d7 280 cases)",
+      "artefact_path": "/home/ubuntu/calb2/v09/v164g_unified/run_summary.json",
+      "sha256": "30d85f5d957d9802bb6eb67402afc1b8e88e84653daeed539b74aa4ff30720e0",
+      "headline_metrics": {
+        "engine_version_tag": "v1.6.4 (cycles 2-5: simulation calibration) + v3.1.0 (engine package)",
+        "cycle_log": [
+          "cycle-2c forwardLoss + adapter signals",
+          "cycle-3 ensembleConfidence allocation-entropy shim",
+          "cycle-4 actuarial dataQuality continuous scoring",
+          "cycle-5 sim-health diagnostic path fixes"
+        ],
+        "cases_total": 280,
+        "cases_ok": 280,
+        "cases_failed": 0,
+        "total_runtime_ms": 21019,
+        "mean_runtime_ms_per_case": 75,
+        "legal_top1": {
+          "hits": 254,
+          "denom": 276,
+          "pct": 92
+        },
+        "legal_l1_mean": 20.92,
+        "engines_total_slots": 54,
+        "engines_filling_100pct": 45,
+        "engines_filling_partial": 4,
+        "engines_dead_zero_pct": 5,
+        "sim_health_verdicts_before_cycles": {
+          "HEALTHY": 10,
+          "STUCK": 14,
+          "DEGENERATE": 1,
+          "SILENT": 12,
+          "BLOWN_UP": 0,
+          "PARTIAL": 0,
+          "diagnostic_label": "v1.6.3 baseline"
+        },
+        "sim_health_verdicts_after_cycles": {
+          "HEALTHY": 21,
+          "STUCK": 13,
+          "DEGENERATE": 1,
+          "SILENT": 1,
+          "BLOWN_UP": 0,
+          "PARTIAL": 1,
+          "diagnostic_label": "v1.6.4g + cycle-5 path fixes"
+        }
+      }
+    },
+    {
+      "leaf_index": 2,
+      "leaf_type": "scenario_map",
+      "title": "Per-case predictions, ground truth, doctrine, Top-1 / L1 (v1.6.4g run)",
+      "artefact_path": "/home/ubuntu/calb2/v09/v164g_unified/scenario_map.json",
+      "sha256": "3dc1ac6f4cf9bf921766b5677bca893b3eb31af5e62963e00248221affda60e8",
+      "case_count": 280
+    },
+    {
+      "leaf_index": 3,
+      "leaf_type": "coverage_matrix",
+      "title": "Per-case \u00d7 per-engine fill matrix (53 slots \u00d7 280 cases, v1.6.4g)",
+      "artefact_path": "/home/ubuntu/calb2/v09/v164g_unified/coverage_matrix.json",
+      "sha256": "df93ab5b82ceb73dce803e159e0522ae0a9f3cc8f75b69e56881b0af47661b5e",
+      "engine_slots": [
+        "report",
+        "boundaryGaps",
+        "evidenceChainCompleteness",
+        "precedentAnalysis",
+        "historicalCaseAnalysis",
+        "severityBenchmark",
+        "contributoryNegligence",
+        "foreseeability",
+        "damagesQuantification",
+        "threeLayerLiability",
+        "recoveryPlan",
+        "litigationRisk",
+        "jurisdictionComparison",
+        "deviationTaxonomy",
+        "twoPassResult",
+        "confidenceIntervals",
+        "edgeEnrichment",
+        "jurisdictionDivergence",
+        "llmForeseeabilityRefinement",
+        "noveltyAnalysis",
+        "vicariousLiability",
+        "insuranceUnderwriting",
+        "supplyChain",
+        "financialRanges",
+        "courtAttribution",
+        "counterfactualSimulation",
+        "causalAnalysis",
+        "auditChain",
+        "reproducibilityCertificate",
+        "liabilityModeAnalysis",
+        "precedentPrediction",
+        "regulatoryFiling",
+        "scmIntegration",
+        "multiCausalAnalysis",
+        "judicialCalibration",
+        "infraCalibration",
+        "cyberCalibration",
+        "unifiedButFor",
+        "actuarialPricing",
+        "financialBlastRadius",
+        "calibratedDamages",
+        "outcomeTypeInference",
+        "regressionDamagesEstimate",
+        "ensembleConfidence",
+        "evidenceSufficiency",
+        "hitlBoundary",
+        "deepSupplyChain",
+        "forwardLoss",
+        "jurisdictionArbitrage",
+        "article73Report",
+        "causalCertificate",
+        "regulatorActions",
+        "autoCalibration",
+        "networkEffect"
+      ]
+    },
+    {
+      "leaf_index": 4,
+      "leaf_type": "per_case_bundle_merkle_root",
+      "title": "Bitcoin-style Merkle root over 280 per-case bundle files (v1.6.4g)",
+      "sha256": "5d78abd314d8bb80f81553fee355a04d387ff174b126bde637f842ff9bd4e276",
+      "sha256_scope": "sha256(canonical-json of {leaf_type, case_count, merkle_algorithm, root, directory})",
+      "merkle_root_of_bundles": "b70961189d89c2f397c342b2c8b2e55ccb98ff09c7b245d20e4a56f9b3d37e85",
+      "case_count": 280,
+      "directory": "/home/ubuntu/calb2/v09/v164g_unified/per_case",
+      "sample_inclusion_witnesses": [
+        {
+          "case_id": "L1-001",
+          "sha256": "6fb6bc473d246a6bff1a9fdce9e4adb39a55fc397675e7f9ded337e197ffb095"
+        },
+        {
+          "case_id": "L2-911",
+          "sha256": "7c4fd3a36a91bf148b360723f38a14d0fa462645c0787b115aa6f8fb5c87c8cd"
+        },
+        {
+          "case_id": "L9-907",
+          "sha256": "86f81a474d9196c2ab20437bb2d5f1af95a4c48f1ac4151906eb185df1174219"
+        }
+      ]
+    },
+    {
+      "leaf_index": 5,
+      "leaf_type": "engine_code_fingerprint",
+      "title": "Engine source fingerprints \u2014 cycles 2-5 simulation calibration locked",
+      "artefact_path": "/home/ubuntu/work/causallayer/server/engine/forwardLossModeling.ts",
+      "sha256": "475cd2939e42e794fa5b9c370639fab9ea82746e3b48238ceb563d7f834c204c",
+      "scope": "Locks the four code changes that comprise simulation-calibration cycles 2-5: forwardLossModeling.ts (cycle 2 continuous formula), index.ts (cycle 2 oversight + complianceMaturity + historicalIncidents derivations), calb2_v091_unified_run.ts (cycle 2 adapter signal flow + cycle 3 ensemble shim), insuranceActuarial.ts (cycle 4 continuous dataQuality scoring), sim_health.py (cycle 5 audit-script bundle paths corrected), meta_calibration_seed.json (cycle-1 seed for ensemble calibrationTier).",
+      "supporting_artefacts": {
+        "forward_loss_modeling": {
+          "path": "/home/ubuntu/work/causallayer/server/engine/forwardLossModeling.ts",
+          "sha256": "475cd2939e42e794fa5b9c370639fab9ea82746e3b48238ceb563d7f834c204c",
+          "locks": "cycle-2c continuous modelConfidence formula"
+        },
+        "engine_index": {
+          "path": "/home/ubuntu/work/causallayer/server/engine/index.ts",
+          "sha256": "88f63ffbda31b0aca481612c6329bf553c870a1368bea789541c49d37853fe2a",
+          "locks": "cycle-2 ForwardLossInput derivation (oversight, compliance, history)"
+        },
+        "insurance_actuarial": {
+          "path": "/home/ubuntu/work/causallayer/server/engine/insuranceActuarial.ts",
+          "sha256": "2db2cc40a692b4a6e4de5784d717edc6c73cc7d68c4a11c81f2b8b24164f5002",
+          "locks": "cycle-4 assessDataQuality continuous formula"
+        },
+        "orchestrator": {
+          "path": "/home/ubuntu/work/causallayer/scripts/calb2_v091_unified_run.ts",
+          "sha256": "2b0f04c6235cc479459265bf1fc6f43903696d69699dd922914e9b3905eeead2",
+          "locks": "cycle-2c adapter signals + cycle-3 ensemble entropy shim"
+        },
+        "sim_health_audit": {
+          "path": "/home/ubuntu/work/causallayer/scripts/engine_audit/sim_health.py",
+          "sha256": "14bb3cb9881e2fdb5910145a41c3a73b42fb55f9dd7fcab5287860f6924f5322",
+          "locks": "cycle-5 12 path corrections (riskTier, lossSeverity.expectedLossUsd, technicalPremium.purePremiumUsd, totalEstimatedRange.{low,midpoint,high}Cents, portfolioBlastRadius.totalUltimateLossUsd, calibratedClaimantPct, calibratedOperatorFaultPct, calibratedVendorFaultPct)"
+        },
+        "meta_calibration_seed": {
+          "path": "/home/ubuntu/work/causallayer/data/meta_calibration_seed.json",
+          "sha256": "0a9c629aea48122c99c964880fd279e929b3847c78f21d33c6ddfba8fc2cdee8",
+          "locks": "cycle-1 highly_calibrated tier seed for ensembleConfidence"
+        }
+      }
+    },
+    {
+      "leaf_index": 6,
+      "leaf_type": "sim_health_diagnostic",
+      "title": "Sim-engine health verdicts (after cycles 2-5)",
+      "artefact_path": "/tmp/sim_health_v164g_paths.md",
+      "sha256": "07bb2118dc93134caab1f1c99ee48fb9a8d912ea15cb2c74e88b5fd78f3868c4",
+      "scope": "Snapshot of the sim_health.py audit verdicts after cycles 2-5 are applied. Each of 37 simulation/forecasting engine fields is scored as HEALTHY / STUCK / DEGENERATE / SILENT / PARTIAL / BLOWN_UP based on unique-value count, dominance fraction, blow-up ratio, and fire rate over the 280-case corpus.",
+      "verdict_summary": {
+        "HEALTHY": 21,
+        "STUCK": 13,
+        "DEGENERATE": 1,
+        "SILENT": 1,
+        "BLOWN_UP": 0,
+        "PARTIAL": 1,
+        "diagnostic_label": "v1.6.4g + cycle-5 path fixes"
+      },
+      "deltas_vs_v163_baseline": {
+        "HEALTHY": "+11   (10 -> 21)",
+        "STUCK": "-1    (14 -> 13)",
+        "SILENT": "-11   (12 -> 1, false-negatives unmasked)",
+        "DEGENERATE": "0   (1  -> 1)",
+        "PARTIAL": "+1    (0  -> 1)"
+      },
+      "engines_unstuck_in_v164": [
+        "forward_loss.modelConfidence",
+        "forward_loss.recommendedPremium",
+        "litigation_risk.category",
+        "ensemble.statedConfidence",
+        "ensemble.adjustment",
+        "actuarial.dataQualityScore"
+      ],
+      "engines_newly_visible_as_healthy": [
+        "insurance_underwriting.tier",
+        "insurance_underwriting.expectedLoss",
+        "insurance_underwriting.claimsProbability",
+        "actuarial.technicalPremium",
+        "damages.totalLow",
+        "damages.totalMid",
+        "damages.totalHigh",
+        "blast_radius.totalExposure"
+      ],
+      "engines_still_stuck_for_future_cycles": [
+        "insurance_underwriting.tier (decline=279/280)",
+        "actuarial.commercialPremium (uniform $2.5M)",
+        "boundary_gaps.{overallSeverity,totalGaps,governanceScore,liabilityMultiplier}",
+        "network_effect.{contributionValue,networkSize}",
+        "regulator_actions.matchedCount",
+        "judicial_calibration.adjustment",
+        "infra_calibration.score",
+        "cyber_calibration.score (PARTIAL)",
+        "ensemble.calibrationTier (DEGENERATE)"
+      ]
+    }
+  ],
+  "merkle_algorithm": "sha256-bitcoin-duplicate-pair",
+  "batch_merkle_root": "146e5c978b78ee2f1345b3c97b97be02bf9baa213c94ef363290ee80ea78d72b",
+  "status": "pre-genesis-test",
+  "notes": "Continuation of the v1.6.3 run with simulation-engine calibration fixes applied across four iterative cycles (cycles 2-5). The legal attribution scorer was held fixed during this work (Top-1 unchanged at 92.0%, mean L1 unchanged at 20.92), and all four cycles target downstream simulation/forecasting engines that were emitting single-value or near-single-value outputs across the entire 280-case corpus. Cycle 2c restored per-case variability through the structured incident adapter; cycle 3 broke the calibratedConfidence / ensemble single-point-of-failure with an allocation-entropy shim; cycle 4 replaced the saturating data-quality step function with continuous scoring; cycle 5 fixed a dozen audit-script bundle paths that had been masking which engines were actually firing. Net: 11 more engines now HEALTHY in the audit (+ 6 newly visible), 11 fewer false SILENT verdicts. Remaining stuck engines (tracked) all require either upstream input variability that the synthetic CALB-2 v0.9.1 corpus does not provide, or deeper engine-internal refactors out of scope for the calibration cycle.",
+  "batch_body_sha256": "6c0f1a8102df0a30d97c94befb38fe32c09d8685b627def0bab1dd9e2fc9ae46",
+  "signature": {
+    "alg": "ed25519",
+    "signed_field": "batch_body_sha256",
+    "signature_hex": "c586b5e4ee4a6cb46c89d15afc8dfe08221956dcb76f0e4c142df06e8f008505f8d87f5bbe31183f0617a635792c6eec77ba4b7867e68653fd75719e5a12fd0c",
+    "pubkey_sha256_fingerprint": "5b7fc9b398b162e4900f43bddf55cda93c8c7d0b1749cc86e0cbb5754582d6e6"
+  }
+}
