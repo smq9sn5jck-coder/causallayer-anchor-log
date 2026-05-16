@@ -54,7 +54,7 @@ ANCHORS = Path("/home/ubuntu/work/causallayer-anchor-log/anchors")
 OUT     = ANCHORS / "2026-05-16-v1.6.4-simulation-calibration.json"
 KEY     = Path.home() / ".causallayer-secrets/cert.private.pem"
 
-UNIFIED_DIR     = Path("/home/ubuntu/calb2/v09/v164k_unified")
+UNIFIED_DIR     = Path("/home/ubuntu/calb2/v09/v164n_unified")
 RUN_SUMMARY     = UNIFIED_DIR / "run_summary.json"
 SCENARIO_MAP    = UNIFIED_DIR / "scenario_map.json"
 COVERAGE_MATRIX = UNIFIED_DIR / "coverage_matrix.json"
@@ -69,7 +69,7 @@ SIM_HEALTH      = Path("/home/ubuntu/work/causallayer/scripts/engine_audit/sim_h
 META_SEED       = Path("/home/ubuntu/work/causallayer/data/meta_calibration_seed.json")
 
 # Sim-health diagnostic verdict snapshot (for leaf 6)
-SIM_HEALTH_OUT  = Path("/tmp/sim_health_v164k.md")
+SIM_HEALTH_OUT  = Path("/tmp/sim_health_v164n.md")
 
 
 def sha256_file(path: Path) -> str:
@@ -204,14 +204,16 @@ def main():
     fwd_sha = sha256_file(FORWARD_LOSS)
     STRUCTURED_ADAPTER = Path("/home/ubuntu/work/causallayer/server/engine/structuredIntakeAdapter.ts")
     LITIGATION_RISK    = Path("/home/ubuntu/work/causallayer/server/engine/litigationRisk.ts")
+    REGULATOR_CORPUS   = Path("/home/ubuntu/work/causallayer/server/engine/regulatorCorpus.ts")
+    INSURANCE_UW       = Path("/home/ubuntu/work/causallayer/server/engine/insuranceUnderwriting.ts")
     leaves.append({
         "leaf_index": 5,
         "leaf_type": "engine_code_fingerprint",
-        "title": "Engine source fingerprints — cycles 2-8 simulation calibration locked",
+        "title": "Engine source fingerprints — cycles 2-10 simulation calibration locked",
         "artefact_path": str(FORWARD_LOSS),
         "sha256": fwd_sha,
         "scope": (
-            "Locks the seven code changes that comprise simulation-calibration cycles 2-8: "
+            "Locks the nine code changes that comprise simulation-calibration cycles 2-10: "
             "forwardLossModeling.ts (cycle 2 continuous formula), "
             "index.ts (cycle 2 ForwardLossInput derivations + cycle 7 per-case coverage limit), "
             "calb2_v091_unified_run.ts (cycle 2 adapter signals + cycle 3 ensemble shim + cycle 6 buildAffectedParties), "
@@ -219,6 +221,8 @@ def main():
             "sim_health.py (cycle 5 audit-script bundle paths corrected), "
             "structuredIntakeAdapter.ts (cycle 6 StructuredParty per-case overrides), "
             "litigationRisk.ts (cycle 8 empirical-anchored riskCategory thresholds), "
+            "regulatorCorpus.ts (cycle 9 relevance threshold 0.15->0.30), "
+            "insuranceUnderwriting.ts (cycle 10 empirical-anchored riskTier thresholds), "
             "meta_calibration_seed.json (cycle-1 seed for ensemble calibrationTier)."
         ),
         "supporting_artefacts": {
@@ -234,6 +238,10 @@ def main():
                                        "locks": "cycle-6 StructuredParty per-case override fields + adapter merge logic"},
             "litigation_risk":        {"path": str(LITIGATION_RISK), "sha256": sha256_file(LITIGATION_RISK),
                                        "locks": "cycle-8 empirical-anchored riskCategory thresholds (CALB-2 quartiles)"},
+            "regulator_corpus":       {"path": str(REGULATOR_CORPUS), "sha256": sha256_file(REGULATOR_CORPUS),
+                                       "locks": "cycle-9 findRelevantRegulatorActions relevance threshold 0.15->0.30"},
+            "insurance_underwriting": {"path": str(INSURANCE_UW), "sha256": sha256_file(INSURANCE_UW),
+                                       "locks": "cycle-10 scoreToTier empirical-anchored cutoffs (700/790/820 vs 250/500/750)"},
             "sim_health_audit":       {"path": str(SIM_HEALTH),   "sha256": sha256_file(SIM_HEALTH),
                                        "locks": "cycle-5 12 path corrections (riskTier, lossSeverity.expectedLossUsd, technicalPremium.purePremiumUsd, totalEstimatedRange.{low,midpoint,high}Cents, portfolioBlastRadius.totalUltimateLossUsd, calibratedClaimantPct, calibratedOperatorFaultPct, calibratedVendorFaultPct)"},
             "meta_calibration_seed":  {"path": str(META_SEED),    "sha256": sha256_file(META_SEED) if META_SEED.exists() else None,
@@ -246,19 +254,19 @@ def main():
     leaves.append({
         "leaf_index": 6,
         "leaf_type": "sim_health_diagnostic",
-        "title": "Sim-engine health verdicts (after cycles 2-5)",
+        "title": "Sim-engine health verdicts (after cycles 2-10)",
         "artefact_path": str(SIM_HEALTH_OUT),
         "sha256": sh_sha,
         "scope": (
-            "Snapshot of the sim_health.py audit verdicts after cycles 2-5 are applied. "
+            "Snapshot of the sim_health.py audit verdicts after cycles 2-10 are applied. "
             "Each of 37 simulation/forecasting engine fields is scored as HEALTHY / "
             "STUCK / DEGENERATE / SILENT / PARTIAL / BLOWN_UP based on unique-value "
             "count, dominance fraction, blow-up ratio, and fire rate over the 280-case corpus."
         ),
         "verdict_summary": headline["sim_health_verdicts_after_cycles"],
         "deltas_vs_v163_baseline": {
-            "HEALTHY":  "+16   (10 -> 26)",
-            "STUCK":    "-5    (14 -> 9)",
+            "HEALTHY":  "+18   (10 -> 28)",
+            "STUCK":    "-7    (14 -> 7)",
             "SILENT":   "-11   (12 -> 1, false-negatives unmasked)",
             "DEGENERATE": "0   (1  -> 1)",
             "PARTIAL":  "0    (0  -> 0)",
@@ -268,6 +276,8 @@ def main():
             "forward_loss.recommendedPremium (cycle 2)",
             "ensemble.statedConfidence (cycle 3)",
             "ensemble.adjustment (cycle 3)",
+            "regulator_actions.matchedCount (cycle 9)",
+            "insurance_underwriting.tier (cycle 10)",
             "actuarial.dataQualityScore (cycle 4)",
             "boundary_gaps.totalGaps (cycle 6)",
             "boundary_gaps.governanceScore (cycle 6)",
@@ -303,7 +313,7 @@ def main():
 
     batch = {
         "schema": "causallayer.audit-batch.v1",
-        "title": "CausalLayer v1.6.4 — SIMULATION-ENGINE CALIBRATION DAY (cycles 2-8)",
+        "title": "CausalLayer v1.6.4 — SIMULATION-ENGINE CALIBRATION DAY (cycles 2-10)",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "engine_package_version": "3.1.1",
         "legal_scorer_doctrinal_version": "1.6.2",
