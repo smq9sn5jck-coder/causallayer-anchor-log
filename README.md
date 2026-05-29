@@ -203,3 +203,9 @@ CausalLayer claims publicly, please open a P0 issue:
 - Genesis declaration: [`GENESIS.md`](./GENESIS.md)
 - Current operational status (what's verifiable today vs. pending):
   [`STATUS.md`](./STATUS.md)
+
+---
+
+## Free AI Liability Risk Assessment
+
+> **Deploying AI in a regulated industry?** Take the free [FaultKey AI Liability Risk Assessment](https://form.jotform.com/261486061447056) — 2 minutes, no sales call. Covers EU AI Act Article 73, APRA CPS 230, and NIST AI RMF.
