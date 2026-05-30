@@ -1,0 +1,57 @@
+{
+  "anchorType": "prospective-prediction",
+  "anchorVersion": 1,
+  "predictionId": "GARCIA-V-CHARACTER-2024",
+  "status": "open",
+  "sourceCommit": {
+    "repo": "https://github.com/smq9sn5jck-coder/causallayer",
+    "sha1": "33e41780da15fe77b69730e8727ce79fe650f8aa",
+    "authorDate": "2026-04-07T11:36:18-04:00",
+    "commitMessage": "Checkpoint: Prospective Validation + Stripe Payment Integration",
+    "fileBlobSha1": "5ae71fa02dc7daac5164232b078255ac9783a714",
+    "filePath": "server/engine/validation/prospectiveIncidents.ts",
+    "fileBlobSha256": "cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+    "commitObjectSha256": "4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca"
+  },
+  "prediction": {
+    "caseId": "GARCIA-V-CHARACTER-2024",
+    "caseName": "Garcia v. Character Technologies \u2014 AI Teen Safety",
+    "category": "safety",
+    "predictionDate": "2026-04-08",
+    "statusAtPrediction": "Active litigation; partial settlement discussions",
+    "predictedPrimaryLiable": "Character.AI Chatbot",
+    "predictedScores": [
+      {
+        "agent": "Character.AI Chatbot",
+        "pct": 55.0
+      },
+      {
+        "agent": "Character.AI Platform",
+        "pct": 45.0
+      }
+    ],
+    "sources": [
+      "Garcia v. Character Technologies (M.D. Fla.)",
+      "Wired, Mar 19, 2026"
+    ],
+    "openQuestions": [
+      "Will Section 230 shield Character.AI from product liability?",
+      "Will court treat AI chatbot output as a 'product'?",
+      "What duty of care applies to AI platforms with minors?"
+    ],
+    "description": "14-year-old developed emotional dependency on Character.AI bot. Chatbot engaged in romantic roleplay, failed to escalate crisis signals."
+  },
+  "outcome": null,
+  "methodology": {
+    "evidenceType": "git-commit-history + opentimestamps",
+    "cryptographicAnchor": "opentimestamps-stamped-before-outcome",
+    "note": "This document was OTS-stamped while the case outcome is still unknown. The Bitcoin-blockchain attestation proves this prediction existed before resolution.",
+    "verificationSteps": [
+      "1. Clone https://github.com/smq9sn5jck-coder/causallayer",
+      "2. Run: git show 33e41780da15fe77b69730e8727ce79fe650f8aa:server/engine/validation/prospectiveIncidents.ts | sha256sum",
+      "3. Confirm output matches: cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+      "4. Verify OTS proof: ots verify garcia-v-character-2024-prediction.json.ots"
+    ]
+  },
+  "generatedAt": "2026-05-30T21:15:11.591724+00:00"
+}

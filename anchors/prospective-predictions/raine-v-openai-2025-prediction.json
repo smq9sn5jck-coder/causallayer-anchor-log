@@ -1,0 +1,57 @@
+{
+  "anchorType": "prospective-prediction",
+  "anchorVersion": 1,
+  "predictionId": "RAINE-V-OPENAI-2025",
+  "status": "open",
+  "sourceCommit": {
+    "repo": "https://github.com/smq9sn5jck-coder/causallayer",
+    "sha1": "33e41780da15fe77b69730e8727ce79fe650f8aa",
+    "authorDate": "2026-04-07T11:36:18-04:00",
+    "commitMessage": "Checkpoint: Prospective Validation + Stripe Payment Integration",
+    "fileBlobSha1": "5ae71fa02dc7daac5164232b078255ac9783a714",
+    "filePath": "server/engine/validation/prospectiveIncidents.ts",
+    "fileBlobSha256": "cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+    "commitObjectSha256": "4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca"
+  },
+  "prediction": {
+    "caseId": "RAINE-V-OPENAI-2025",
+    "caseName": "Raine v. OpenAI \u2014 ChatGPT Teen Suicide",
+    "category": "safety",
+    "predictionDate": "2026-04-08",
+    "statusAtPrediction": "Active litigation, California",
+    "predictedPrimaryLiable": "ChatGPT",
+    "predictedScores": [
+      {
+        "agent": "ChatGPT",
+        "pct": 55.0
+      },
+      {
+        "agent": "OpenAI Safety Systems",
+        "pct": 45.0
+      }
+    ],
+    "sources": [
+      "Raine v. OpenAI (Cal. Superior Court)",
+      "TorHoerman Law, Apr 2, 2026"
+    ],
+    "openQuestions": [
+      "Does Section 230 protect AI-generated content causing harm?",
+      "Will court classify ChatGPT outputs as 'speech' or 'product design'?",
+      "What standard of care for AI systems interacting with minors?"
+    ],
+    "description": "ChatGPT allegedly encouraged teen's suicidal ideation, provided detailed methods, helped draft suicide note, and discouraged seeking help from parents."
+  },
+  "outcome": null,
+  "methodology": {
+    "evidenceType": "git-commit-history + opentimestamps",
+    "cryptographicAnchor": "opentimestamps-stamped-before-outcome",
+    "note": "This document was OTS-stamped while the case outcome is still unknown. The Bitcoin-blockchain attestation proves this prediction existed before resolution.",
+    "verificationSteps": [
+      "1. Clone https://github.com/smq9sn5jck-coder/causallayer",
+      "2. Run: git show 33e41780da15fe77b69730e8727ce79fe650f8aa:server/engine/validation/prospectiveIncidents.ts | sha256sum",
+      "3. Confirm output matches: cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+      "4. Verify OTS proof: ots verify raine-v-openai-2025-prediction.json.ots"
+    ]
+  },
+  "generatedAt": "2026-05-30T21:15:11.591724+00:00"
+}

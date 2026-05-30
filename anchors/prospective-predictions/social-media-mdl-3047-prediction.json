@@ -1,0 +1,62 @@
+{
+  "anchorType": "prospective-prediction",
+  "anchorVersion": 1,
+  "predictionId": "SOCIAL-MEDIA-MDL-3047",
+  "status": "open",
+  "sourceCommit": {
+    "repo": "https://github.com/smq9sn5jck-coder/causallayer",
+    "sha1": "33e41780da15fe77b69730e8727ce79fe650f8aa",
+    "authorDate": "2026-04-07T11:36:18-04:00",
+    "commitMessage": "Checkpoint: Prospective Validation + Stripe Payment Integration",
+    "fileBlobSha1": "5ae71fa02dc7daac5164232b078255ac9783a714",
+    "filePath": "server/engine/validation/prospectiveIncidents.ts",
+    "fileBlobSha256": "cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+    "commitObjectSha256": "4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca"
+  },
+  "prediction": {
+    "caseId": "SOCIAL-MEDIA-MDL-3047",
+    "caseName": "Social Media AI Addiction MDL \u2014 Algorithmic Harm",
+    "category": "safety",
+    "predictionDate": "2026-04-08",
+    "statusAtPrediction": "$6M bellwether verdict (Mar 25, 2026); 2,200+ cases pending",
+    "predictedPrimaryLiable": "Meta Recommendation Algorithm",
+    "predictedScores": [
+      {
+        "agent": "Meta Recommendation Algorithm",
+        "pct": 39.0
+      },
+      {
+        "agent": "Platform Design Features",
+        "pct": 31.0
+      },
+      {
+        "agent": "YouTube Recommendation Algorithm",
+        "pct": 30.0
+      }
+    ],
+    "sources": [
+      "MDL No. 3047 (N.D. Cal.)",
+      "NPR, Mar 25, 2026",
+      "CNBC, Apr 3, 2026"
+    ],
+    "openQuestions": [
+      "Will the $6M bellwether verdict survive appeal?",
+      "Will subsequent bellwether trials produce similar results?",
+      "What will aggregate settlement/damages be across 2,200+ cases?"
+    ],
+    "description": "2,200+ consolidated cases alleging AI recommendation algorithms are defective products causing adolescent addiction. First bellwether trial found Meta and Google negligent."
+  },
+  "outcome": null,
+  "methodology": {
+    "evidenceType": "git-commit-history + opentimestamps",
+    "cryptographicAnchor": "opentimestamps-stamped-before-outcome",
+    "note": "This document was OTS-stamped while the case outcome is still unknown. The Bitcoin-blockchain attestation proves this prediction existed before resolution.",
+    "verificationSteps": [
+      "1. Clone https://github.com/smq9sn5jck-coder/causallayer",
+      "2. Run: git show 33e41780da15fe77b69730e8727ce79fe650f8aa:server/engine/validation/prospectiveIncidents.ts | sha256sum",
+      "3. Confirm output matches: cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+      "4. Verify OTS proof: ots verify social-media-mdl-3047-prediction.json.ots"
+    ]
+  },
+  "generatedAt": "2026-05-30T21:15:11.591724+00:00"
+}

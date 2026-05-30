@@ -20,7 +20,13 @@ Cases where the outcome was already known at commit time are classified as
 
 | File | Case | Committed | Outcome | Lead Time | Status |
 |------|------|-----------|---------|-----------|--------|
-| `agri-stats-prediction-canonical.json` | DOJ v. Agri Stats | 2026-04-07 | 2026-05-07 | 30 days | Confirmed |
+| `agri-stats-prediction-canonical.json` | DOJ v. Agri Stats | 2026-04-07 | 2026-05-07 | 30 days | **Confirmed** |
+| `nyt-v-openai-2023-prediction.json` | NYT v. OpenAI | 2026-04-07 | TBD (trial Sep 2026) | — | Open |
+| `garcia-v-character-2024-prediction.json` | Garcia v. Character.AI | 2026-04-07 | TBD | — | Open |
+| `raine-v-openai-2025-prediction.json` | Raine v. OpenAI | 2026-04-07 | TBD | — | Open |
+| `social-media-mdl-3047-prediction.json` | Social Media MDL 3047 | 2026-04-07 | TBD | — | Open |
+| `adams-v-openai-2025-prediction.json` | Adams v. OpenAI/Microsoft | 2026-04-07 | TBD | — | Open |
+| `ai-insurance-denial-2026-prediction.json` | AI Insurance Denial | 2026-04-07 | TBD | — | Open |
 
 ## Verification
 

@@ -1,0 +1,57 @@
+{
+  "anchorType": "prospective-prediction",
+  "anchorVersion": 1,
+  "predictionId": "AI-INSURANCE-DENIAL-2026",
+  "status": "open",
+  "sourceCommit": {
+    "repo": "https://github.com/smq9sn5jck-coder/causallayer",
+    "sha1": "33e41780da15fe77b69730e8727ce79fe650f8aa",
+    "authorDate": "2026-04-07T11:36:18-04:00",
+    "commitMessage": "Checkpoint: Prospective Validation + Stripe Payment Integration",
+    "fileBlobSha1": "5ae71fa02dc7daac5164232b078255ac9783a714",
+    "filePath": "server/engine/validation/prospectiveIncidents.ts",
+    "fileBlobSha256": "cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+    "commitObjectSha256": "4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca"
+  },
+  "prediction": {
+    "caseId": "AI-INSURANCE-DENIAL-2026",
+    "caseName": "AI Insurance Claim Denial \u2014 Algorithmic Denial Pattern",
+    "category": "consumer",
+    "predictionDate": "2026-04-08",
+    "statusAtPrediction": "Discovery phase \u2014 court ordered AI system disclosure",
+    "predictedPrimaryLiable": "AI Claim Processing System",
+    "predictedScores": [
+      {
+        "agent": "AI Claim Processing System",
+        "pct": 55.0
+      },
+      {
+        "agent": "Human Claims Reviewer",
+        "pct": 45.0
+      }
+    ],
+    "sources": [
+      "Hunton Andrews Kurth, Mar 23, 2026",
+      "Minnesota federal court order"
+    ],
+    "openQuestions": [
+      "Will discovery reveal systematic bias in AI claim processing?",
+      "Will this establish precedent for AI transparency in insurance?",
+      "Will class certification follow if systemic pattern proven?"
+    ],
+    "description": "Minnesota court ordered insurer to disclose AI system used to deny claims. Policyholders allege systematic AI-driven denials without adequate human review."
+  },
+  "outcome": null,
+  "methodology": {
+    "evidenceType": "git-commit-history + opentimestamps",
+    "cryptographicAnchor": "opentimestamps-stamped-before-outcome",
+    "note": "This document was OTS-stamped while the case outcome is still unknown. The Bitcoin-blockchain attestation proves this prediction existed before resolution.",
+    "verificationSteps": [
+      "1. Clone https://github.com/smq9sn5jck-coder/causallayer",
+      "2. Run: git show 33e41780da15fe77b69730e8727ce79fe650f8aa:server/engine/validation/prospectiveIncidents.ts | sha256sum",
+      "3. Confirm output matches: cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+      "4. Verify OTS proof: ots verify ai-insurance-denial-2026-prediction.json.ots"
+    ]
+  },
+  "generatedAt": "2026-05-30T21:15:11.591724+00:00"
+}
