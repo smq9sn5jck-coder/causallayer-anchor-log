@@ -1,0 +1,65 @@
+{
+  "anchorType": "prospective-prediction",
+  "anchorVersion": 1,
+  "predictionId": "DOJ-V-AGRISTATS-2023",
+  "sourceCommit": {
+    "repo": "https://github.com/smq9sn5jck-coder/causallayer",
+    "sha1": "33e41780da15fe77b69730e8727ce79fe650f8aa",
+    "authorDate": "2026-04-07T11:36:18-04:00",
+    "commitMessage": "Checkpoint: Prospective Validation + Stripe Payment Integration",
+    "fileBlobSha1": "5ae71fa02dc7daac5164232b078255ac9783a714",
+    "filePath": "server/engine/validation/prospectiveIncidents.ts",
+    "fileBlobSha256": "cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+    "commitObjectSha256": "4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca"
+  },
+  "prediction": {
+    "caseId": "DOJ-V-AGRISTATS-2023",
+    "caseName": "DOJ v. Agri Stats — Algorithmic Price Coordination in Meat Processing",
+    "category": "antitrust",
+    "predictionDate": "2026-04-08",
+    "statusAtPrediction": "Trial date May 4, 2026 — less than 1 month away",
+    "predictedPrimaryLiable": "Agri Stats Platform",
+    "predictedScores": [
+      { "agent": "Agri Stats Platform", "pct": 55.0 },
+      { "agent": "Subscribing Meat Processors", "pct": 45.0 }
+    ],
+    "sources": [
+      "United States v. Agri Stats, Inc. (D. Minn.)",
+      "Akin Gump, Mar 16, 2026 — CMA algorithmic pricing analysis",
+      "Trial date: May 4, 2026"
+    ],
+    "openQuestions": [
+      "Will court apply per se rule or rule of reason to data-sharing platform?",
+      "Is the 'hub-and-spoke' theory viable for data analytics platforms?",
+      "What precedent does this set for algorithmic pricing tools generally?"
+    ]
+  },
+  "outcome": {
+    "resolutionDate": "2026-05-07",
+    "resolutionType": "consent-decree",
+    "source": "https://www.justice.gov/opa/pr/justice-department-requires-agri-stats-end-exchange-competitively-sensitive-information",
+    "primaryLiableParty": "Agri Stats",
+    "summary": "DOJ required Agri Stats to end the exchange of competitively sensitive information among meat processors. Consent decree targets the platform operator, not the subscribing processors.",
+    "predictionCorrect": true,
+    "leadTimeDays": 30
+  },
+  "methodology": {
+    "evidenceType": "git-commit-history",
+    "cryptographicAnchor": "opentimestamps-pending",
+    "limitations": [
+      "Git commit history can theoretically be rewritten (force-push). GitHub server-side timestamps provide corroboration but are not independently verifiable.",
+      "This anchor is being created retroactively (May 2026) to cryptographically seal the prediction that was committed in April 2026.",
+      "The OpenTimestamps proof will attest to the existence of this document at the time of stamping, not at the time of the original prediction.",
+      "The chain of evidence is: (1) Git commit Apr 7 → (2) This canonical document → (3) OTS proof. Step 1→2 relies on Git integrity."
+    ],
+    "verificationSteps": [
+      "1. Clone https://github.com/smq9sn5jck-coder/causallayer",
+      "2. Run: git show 33e41780:server/engine/validation/prospectiveIncidents.ts | sha256sum",
+      "3. Confirm output matches fileBlobSha256 above: cbd26012492a0d6818579106de5d455db3f794a7b88b2f2777bfe2242428d0da",
+      "4. Run: git cat-file commit 33e41780 | sha256sum",
+      "5. Confirm output matches commitObjectSha256 above: 4b6bacdf8c1cef4c486c15a72fe49a178239166019fd224177631a1e47f072ca",
+      "6. Verify OTS proof: ots verify agri-stats-prediction-canonical.json.ots"
+    ]
+  },
+  "generatedAt": "2026-05-31T06:30:00+10:00"
+}
