@@ -49,6 +49,31 @@ function merkleRoot(leafStrings) {
 }
 
 /**
+ * Merkle root for batch anchors (causallayer.audit-batch.v1): leaves are already
+ * SHA-256 hex digests, decoded from hex and combined WITHOUT re-hashing the leaf.
+ *   internal = sha256(left || right); odd nodes are duplicated.
+ */
+function merkleRootHex(hexLeaves) {
+  if (hexLeaves.length === 0) return sha256(Buffer.alloc(0)).toString("hex");
+  let layer = hexLeaves.map((h) => Buffer.from(h, "hex"));
+  while (layer.length > 1) {
+    const next = [];
+    for (let i = 0; i < layer.length; i += 2) {
+      const left = layer[i];
+      const right = i + 1 < layer.length ? layer[i + 1] : layer[i];
+      next.push(sha256(Buffer.concat([left, right])));
+    }
+    layer = next;
+  }
+  return layer[0].toString("hex");
+}
+
+/** Decode an Ed25519 signature, preferring an explicit 128-hex match over length alone. */
+function decodeSignature(sig) {
+  return Buffer.from(sig, /^[0-9a-fA-F]{128}$/.test(sig) ? "hex" : "base64");
+}
+
+/**
  * Canonical JSON: stable key ordering at every depth. Matches the engine.
  */
 function canonicalize(value) {
@@ -85,7 +110,67 @@ function main() {
   }
   const anchorPath = path.resolve(file);
   const scriptDir = __dirname;
-  const record = JSON.parse(fs.readFileSync(anchorPath, "utf8"));
+
+  let record;
+  try {
+    record = JSON.parse(fs.readFileSync(anchorPath, "utf8"));
+  } catch (err) {
+    console.error(`cannot read/parse ${anchorPath}: ${err.message}`);
+    process.exit(2);
+  }
+  if (!record || typeof record !== "object") {
+    console.error(`${anchorPath}: not a JSON object`);
+    process.exit(2);
+  }
+
+  const pubKey = loadPublicKey(scriptDir);
+  const otsPath = anchorPath + ".ots";
+  const otsNote = () => {
+    if (fs.existsSync(otsPath)) {
+      console.log(`ots proof    : present at ${path.basename(otsPath)}`);
+      console.log(`               run: ots verify ${otsPath}`);
+    } else {
+      console.log("ots proof    : not yet attached (anchor may be < ~3h old)");
+    }
+  };
+
+  // ── Batch anchor schema (causallayer.audit-batch.v1): no `payload`, leaves are
+  //    pre-hashed hex digests, signature is an object over `batch_body_sha256`. ──
+  const isBatch =
+    typeof record.schema === "string" && record.schema.startsWith("causallayer.audit-batch");
+  if (isBatch || (!record.payload && record.batch_merkle_root)) {
+    if (!Array.isArray(record.leaves) || typeof record.batch_merkle_root !== "string" ||
+        !record.signature || typeof record.signature !== "object") {
+      console.error(`${anchorPath}: malformed batch anchor (missing leaves/batch_merkle_root/signature)`);
+      process.exit(2);
+    }
+    const leafHashes = record.leaves.map((l) => l.sha256);
+    const recomputed = merkleRootHex(leafHashes);
+    const merkleOk = recomputed === record.batch_merkle_root;
+    console.log(`batch merkle : ${merkleOk ? "OK  " : "FAIL"}  recomputed=${recomputed}`);
+    if (!merkleOk) console.log(`               claimed   =${record.batch_merkle_root}`);
+
+    const signedField = record.signature.signed_field;
+    const signedValue = record[signedField];
+    let sigOk = false;
+    if (typeof signedValue !== "string" || typeof record.signature.signature_hex !== "string") {
+      console.log(`ed25519 sig  : FAIL  (missing signed_field "${signedField}" or signature_hex)`);
+    } else {
+      sigOk = crypto.verify(null, Buffer.from(signedValue, "utf8"), pubKey,
+        Buffer.from(record.signature.signature_hex, "hex"));
+      console.log(`ed25519 sig  : ${sigOk ? "OK  " : "FAIL"}  algo=${record.signature.alg} signed=${signedField}`);
+    }
+    otsNote();
+    console.log(`schema       : ${record.schema}`);
+    console.log(`leaf count   : ${record.leaf_count}`);
+    process.exit(merkleOk && sigOk ? 0 : 1);
+  }
+
+  // ── Daily anchor schema ──
+  if (!record.payload || !Array.isArray(record.payload.leaves) || typeof record.signature !== "string") {
+    console.error(`${anchorPath}: not a recognized anchor (missing payload.leaves / string signature)`);
+    process.exit(2);
+  }
 
   // 1. Merkle
   const recomputed = merkleRoot(record.payload.leaves);
@@ -95,20 +180,13 @@ function main() {
   if (!merkleOk) console.log(`               claimed   =${claimed}`);
 
   // 2. Signature
-  const pubKey = loadPublicKey(scriptDir);
   const canonical = Buffer.from(canonicalize(record.payload), "utf8");
-  const sig = Buffer.from(record.signature, record.signature.length === 128 ? "hex" : "base64");
+  const sig = decodeSignature(record.signature);
   const sigOk = crypto.verify(null, canonical, pubKey, sig);
   console.log(`ed25519 sig  : ${sigOk ? "OK  " : "FAIL"}  algo=${record.signatureAlgorithm}`);
 
   // 3. OTS proof hint
-  const otsPath = anchorPath + ".ots";
-  if (fs.existsSync(otsPath)) {
-    console.log(`ots proof    : present at ${path.basename(otsPath)}`);
-    console.log(`               run: ots verify ${otsPath}`);
-  } else {
-    console.log("ots proof    : not yet attached (anchor may be < ~3h old)");
-  }
+  otsNote();
 
   // 4. Anchor metadata
   console.log(`anchor date  : ${record.payload.anchorDate}`);

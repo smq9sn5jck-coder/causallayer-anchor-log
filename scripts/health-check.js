@@ -211,10 +211,30 @@ function checkGenesisExists() {
 
 function listAnchorFiles() {
   if (!fs.existsSync(ANCHORS_DIR)) return [];
+  // Anchors are named `YYYY-MM-DD-<descriptive-suffix>.json` (e.g.
+  // 2026-05-15-v1.6-calb2-v0.9.0.json), so the matcher must allow a suffix —
+  // the old bare-date-only regex matched nothing and silently skipped every
+  // real anchor, making the trust checks pass vacuously.
   return fs
     .readdirSync(ANCHORS_DIR)
-    .filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .filter(f => /^\d{4}-\d{2}-\d{2}.*\.json$/.test(f))
     .sort();
+}
+
+function merkleRootHex(hexLeaves) {
+  // Batch anchors store pre-hashed hex leaves combined WITHOUT re-hashing.
+  if (hexLeaves.length === 0) return crypto.createHash("sha256").update(Buffer.alloc(0)).digest("hex");
+  let layer = hexLeaves.map(h => Buffer.from(h, "hex"));
+  while (layer.length > 1) {
+    const next = [];
+    for (let i = 0; i < layer.length; i += 2) {
+      const left = layer[i];
+      const right = i + 1 < layer.length ? layer[i + 1] : layer[i];
+      next.push(crypto.createHash("sha256").update(Buffer.concat([left, right])).digest());
+    }
+    layer = next;
+  }
+  return layer[0].toString("hex");
 }
 
 function canonicalize(value) {
@@ -256,6 +276,35 @@ function checkAnchors(pubKey, declaredFingerprint) {
       fail(`A1 (${fname})`, `anchor is not valid JSON: ${err.message}`);
       continue;
     }
+    // Batch anchors (causallayer.audit-batch.v1) use a different schema: pre-hashed
+    // hex leaves, a `batch_merkle_root`, and a signature OBJECT over `batch_body_sha256`.
+    const isBatch =
+      (typeof record.schema === "string" && record.schema.startsWith("causallayer.audit-batch")) ||
+      (!record.payload && record.batch_merkle_root);
+    if (isBatch) {
+      if (!Array.isArray(record.leaves) || typeof record.batch_merkle_root !== "string" ||
+          !record.signature || typeof record.signature !== "object") {
+        fail(`A1 (${fname})`, "batch anchor missing one of: leaves, batch_merkle_root, signature object");
+        continue;
+      }
+      const recomputed = merkleRootHex(record.leaves.map(l => l.sha256));
+      if (recomputed !== record.batch_merkle_root) {
+        fail(`A3 (${fname})`, `batch Merkle root mismatch: recomputed=${recomputed} claimed=${record.batch_merkle_root}`);
+        continue;
+      }
+      if (pubKey) {
+        const signedValue = record[record.signature.signed_field];
+        const sigOk = typeof signedValue === "string" && typeof record.signature.signature_hex === "string" &&
+          crypto.verify(null, Buffer.from(signedValue, "utf8"), pubKey, Buffer.from(record.signature.signature_hex, "hex"));
+        if (!sigOk) {
+          fail(`A4 (${fname})`, "batch Ed25519 signature does not verify against public-key.pem");
+          continue;
+        }
+      }
+      verified.push(record);
+      continue;
+    }
+
     if (!record.payload || !record.signature || !record.publicKeyFingerprint) {
       fail(`A1 (${fname})`, "anchor missing one of: payload, signature, publicKeyFingerprint");
       continue;
@@ -275,7 +324,7 @@ function checkAnchors(pubKey, declaredFingerprint) {
       const canonical = Buffer.from(canonicalize(record.payload), "utf8");
       const sig = Buffer.from(
         record.signature,
-        record.signature.length === 128 ? "hex" : "base64",
+        /^[0-9a-fA-F]{128}$/.test(record.signature) ? "hex" : "base64",
       );
       const sigOk = crypto.verify(null, canonical, pubKey, sig);
       if (!sigOk) {
