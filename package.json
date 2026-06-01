@@ -1,0 +1,14 @@
+{
+  "name": "causallayer-anchor-log",
+  "version": "0.1.0",
+  "description": "Public daily anchor log for CausalLayer / FaultKey, with a zero-dependency Ed25519 + Merkle verifier.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test",
+    "verify": "node scripts/verify-anchor.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
