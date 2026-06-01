@@ -18,7 +18,7 @@
 | Genesis declaration | **Published** | [`GENESIS.md`](./GENESIS.md) |
 | First authoritative anchor | **Pending operational readiness** | will appear at `anchors/YYYY-MM-DD.json` |
 | Continuous daily anchors | **Pending genesis** | one per operational day, forever after |
-| OpenTimestamps witness | **Pending genesis** | `.ots` proof alongside each anchor |
+| OpenTimestamps witness | **Pending genesis** for the authoritative chain; pre-genesis **test** anchors already carry `.ots` proofs | `.ots` proof alongside each anchor |
 | Independent repository mirror | **Pending** | external mirror to remove GitHub-as-single-point-of-failure |
 | Automated verification CI | **Published** | [`.github/workflows/verify.yml`](./.github/workflows/verify.yml) |
 
