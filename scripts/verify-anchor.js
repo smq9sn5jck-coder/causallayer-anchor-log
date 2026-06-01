@@ -91,6 +91,21 @@ function canonicalize(value) {
   );
 }
 
+/**
+ * Pure verification core: recompute the Merkle root and check the Ed25519
+ * signature over the canonical payload. No I/O, no process.exit — returns the
+ * booleans so it can be unit-tested and reused.
+ */
+function verifyAnchorRecord(record, pubKey) {
+  const recomputed = merkleRoot(record.payload.leaves);
+  const claimed = record.payload.merkleRoot;
+  const merkleOk = recomputed === claimed;
+  const canonical = Buffer.from(canonicalize(record.payload), "utf8");
+  const sig = decodeSignature(record.signature);
+  const sigOk = crypto.verify(null, canonical, pubKey, sig);
+  return { merkleOk, sigOk, recomputed, claimed };
+}
+
 function loadPublicKey(scriptDir) {
   const pemPath = path.resolve(scriptDir, "..", "public-key.pem");
   if (!fs.existsSync(pemPath)) {
@@ -172,17 +187,10 @@ function main() {
     process.exit(2);
   }
 
-  // 1. Merkle
-  const recomputed = merkleRoot(record.payload.leaves);
-  const claimed = record.payload.merkleRoot;
-  const merkleOk = recomputed === claimed;
+  // 1 + 2. Merkle root and Ed25519 signature (pubKey already loaded above)
+  const { merkleOk, sigOk, recomputed, claimed } = verifyAnchorRecord(record, pubKey);
   console.log(`merkle root  : ${merkleOk ? "OK  " : "FAIL"}  recomputed=${recomputed}`);
   if (!merkleOk) console.log(`               claimed   =${claimed}`);
-
-  // 2. Signature
-  const canonical = Buffer.from(canonicalize(record.payload), "utf8");
-  const sig = decodeSignature(record.signature);
-  const sigOk = crypto.verify(null, canonical, pubKey, sig);
   console.log(`ed25519 sig  : ${sigOk ? "OK  " : "FAIL"}  algo=${record.signatureAlgorithm}`);
 
   // 3. OTS proof hint
@@ -196,4 +204,10 @@ function main() {
   process.exit(merkleOk && sigOk ? 0 : 1);
 }
 
-main();
+module.exports = { sha256, merkleRoot, canonicalize, verifyAnchorRecord, loadPublicKey, main };
+
+// Only run the CLI when executed directly, so the pure functions above can be
+// required from tests without triggering argv parsing or process.exit.
+if (require.main === module) {
+  main();
+}
