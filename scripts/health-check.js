@@ -293,6 +293,92 @@ function checkAnchors(pubKey, declaredFingerprint) {
   return verified;
 }
 
+// ─── Pre-genesis test anchors ──────────────────────────────────────
+//
+// anchors/ contains version-suffixed records (e.g. 2026-05-15-v1.6-…json)
+// that are NOT authoritative daily anchors — they are explicitly marked
+// pre-genesis test anchors. listAnchorFiles() (and therefore the A*/F1 checks
+// above) deliberately ignore them so the freshness clock only tracks real
+// daily anchors. But "ignored by the freshness clock" must not mean
+// "unverified": these records carry real Ed25519 signatures from the published
+// key, so we verify their integrity here and assert they are clearly labelled
+// as tests (so none can masquerade as an authoritative anchor).
+
+function listTestAnchorFiles() {
+  if (!fs.existsSync(ANCHORS_DIR)) return [];
+  return fs
+    .readdirSync(ANCHORS_DIR)
+    .filter(f => f.endsWith(".json") && !/^\d{4}-\d{2}-\d{2}\.json$/.test(f))
+    .sort();
+}
+
+function checkTestAnchors(pubKey, declaredFingerprint) {
+  const files = listTestAnchorFiles();
+  if (files.length === 0) {
+    pass("T*", "no non-authoritative test anchors present");
+    return;
+  }
+  if (!pubKey) return; // S1 already failed; can't verify signatures without a key
+
+  let verifier;
+  try {
+    verifier = require(VERIFY_SCRIPT_PATH);
+  } catch (err) {
+    fail("T0", `could not load verify-anchor.js to verify test anchors: ${err.message}`);
+    return;
+  }
+
+  let okCount = 0;
+  for (const fname of files) {
+    const fpath = path.join(ANCHORS_DIR, fname);
+    let record;
+    try {
+      record = JSON.parse(fs.readFileSync(fpath, "utf8"));
+    } catch (err) {
+      fail(`T1 (${fname})`, `anchor is not valid JSON: ${err.message}`);
+      continue;
+    }
+
+    // T2: a non-authoritative anchor must be explicitly labelled so it cannot
+    // be mistaken for an authoritative daily anchor.
+    const status = record.status || (record.payload && record.payload.status);
+    if (status !== "pre-genesis-test") {
+      fail(`T2 (${fname})`, `non-authoritative anchor is not marked status "pre-genesis-test" (got ${JSON.stringify(status)})`);
+    }
+
+    // T1: cryptographic integrity — recompute Merkle root, verify Ed25519
+    // signature against the published key, and confirm the fingerprint binding.
+    try {
+      if (verifier.isBatchRecord(record)) {
+        const r = verifier.verifyBatchRecord(record, pubKey);
+        if (!r.merkleOk) { fail(`T1 (${fname})`, "batch Merkle root mismatch"); continue; }
+        if (!r.sigOk) { fail(`T1 (${fname})`, "batch Ed25519 signature does not verify against public-key.pem"); continue; }
+        const fp = record.signature && record.signature.pubkey_sha256_fingerprint;
+        if (declaredFingerprint && fp && fp !== declaredFingerprint) {
+          fail(`T1 (${fname})`, `batch fingerprint (${fp}) does not match fingerprint.txt`); continue;
+        }
+      } else if (record.payload && typeof record.payload === "object") {
+        const r = verifier.verifyAnchorRecord(record, pubKey);
+        if (!r.merkleOk) { fail(`T1 (${fname})`, "Merkle root mismatch"); continue; }
+        if (!r.sigOk) { fail(`T1 (${fname})`, "Ed25519 signature does not verify against public-key.pem"); continue; }
+        if (declaredFingerprint && record.publicKeyFingerprint && record.publicKeyFingerprint !== declaredFingerprint) {
+          fail(`T1 (${fname})`, `publicKeyFingerprint (${record.publicKeyFingerprint}) does not match fingerprint.txt`); continue;
+        }
+      } else {
+        fail(`T1 (${fname})`, "unrecognized anchor schema (no payload and not a batch record)");
+        continue;
+      }
+      okCount++;
+    } catch (err) {
+      fail(`T1 (${fname})`, `verification threw: ${err.message}`);
+    }
+  }
+
+  if (okCount > 0) {
+    pass("T*", `${okCount} pre-genesis test anchor(s) verified (Merkle + Ed25519 + fingerprint binding)`);
+  }
+}
+
 // ─── Freshness (auto-activates post-genesis) ───────────────────────
 
 function checkFreshness(verifiedAnchors) {
@@ -334,6 +420,7 @@ function main() {
     ? fs.readFileSync(FINGERPRINT_PATH, "utf8").trim()
     : null;
   const verifiedAnchors = checkAnchors(pubKey, declaredFingerprint);
+  checkTestAnchors(pubKey, declaredFingerprint);
   checkFreshness(verifiedAnchors);
 
   console.log("");

@@ -116,6 +116,23 @@ function makeRepo(opts = {}) {
     fs.writeFileSync(path.join(root, "anchors", `${anchorDate}.json`), JSON.stringify(record, null, 2));
   }
 
+  // A non-authoritative (version-suffixed) test anchor — exercised by the T* checks.
+  if (opts.testAnchor) {
+    const t = opts.testAnchor;
+    const leaves = t.leaves ?? ["t-leaf-1", "t-leaf-2"];
+    const payload = {
+      anchorDate: "2026-05-15",
+      leafCount: leaves.length,
+      leaves,
+      merkleRoot: merkleRoot(leaves),
+      status: "status" in t ? t.status : "pre-genesis-test",
+    };
+    if (t.tamper) payload.leaves = [...leaves, "sneaky-extra-leaf"]; // breaks Merkle, keeps claimed root
+    const signature = crypto.sign(null, Buffer.from(canonicalize(payload), "utf8"), privateKey).toString("hex");
+    const record = { payload, signature, signatureAlgorithm: "Ed25519", publicKeyFingerprint: fingerprint };
+    fs.writeFileSync(path.join(root, "anchors", t.name ?? "2026-05-15-v1.0-test.json"), JSON.stringify(record, null, 2));
+  }
+
   return root;
 }
 
@@ -186,6 +203,29 @@ test("detects an anchor whose fingerprint does not bind to the repo key (A2, exi
   const { code, out } = runHealthCheck(root);
   assert.equal(code, 1);
   assert.match(out, /A2 .*does not match repo fingerprint/);
+});
+
+// ─── 2e. Pre-genesis test-anchor integrity (T* / T1 / T2) ─────────────────────
+
+test("verifies a well-formed pre-genesis test anchor (T*, exit 0)", () => {
+  const root = makeRepo({ testAnchor: {} });
+  const { code, out } = runHealthCheck(root);
+  assert.equal(code, 0, out);
+  assert.match(out, /T\*: 1 pre-genesis test anchor\(s\) verified/);
+});
+
+test("fails a test anchor that is not marked pre-genesis-test (T2, exit 1)", () => {
+  const root = makeRepo({ testAnchor: { status: "authoritative" } });
+  const { code, out } = runHealthCheck(root);
+  assert.equal(code, 1);
+  assert.match(out, /T2 .*not marked status "pre-genesis-test"/);
+});
+
+test("detects a tampered pre-genesis test anchor (T1, exit 1)", () => {
+  const root = makeRepo({ testAnchor: { tamper: true } });
+  const { code, out } = runHealthCheck(root);
+  assert.equal(code, 1);
+  assert.match(out, /T1 .*Merkle root mismatch/);
 });
 
 // ─── 2d. Freshness branch (auto-activates once anchors exist) ─────────────────

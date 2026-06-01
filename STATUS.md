@@ -62,7 +62,12 @@ These become verifiable from the genesis anchor onward.
 During the genesis period the production private key is being moved out of the
 build sandbox and into permanent custody (offline backup plus a managed secret
 store). Until that handover is complete and the first authoritative anchor has
-been signed, no anchors exist and the published public key has signed nothing.
+been signed, no **authoritative** anchor exists. The only signed records in
+[`anchors/`](./anchors/) are explicitly-marked pre-genesis **test** anchors
+(`status: pre-genesis-test`): they carry real Ed25519 signatures from the
+published key and are verified on every CI run (see the `T*` checks in
+[`scripts/health-check.js`](./scripts/health-check.js)), but they are not
+authoritative daily anchors and make no accuracy claim about any incident.
 This is the same pre-genesis state already documented above, restated here for
 completeness so that any future reader of this file's commit history sees that
 the operational gap was disclosed in real time rather than discovered later.

@@ -72,6 +72,12 @@ function canonicalize(value) {
  * booleans so it can be unit-tested and reused.
  */
 function verifyAnchorRecord(record, pubKey) {
+  if (!record || typeof record.payload !== "object" || record.payload === null) {
+    throw new Error(
+      "record has no `payload` object — this is not a daily/cert anchor. " +
+        "Batch anchors (schema causallayer.audit-batch.*) use verifyBatchRecord().",
+    );
+  }
   const recomputed = merkleRoot(record.payload.leaves);
   const claimed = record.payload.merkleRoot;
   const merkleOk = recomputed === claimed;
@@ -79,6 +85,70 @@ function verifyAnchorRecord(record, pubKey) {
   const sig = Buffer.from(record.signature, record.signature.length === 128 ? "hex" : "base64");
   const sigOk = crypto.verify(null, canonical, pubKey, sig);
   return { merkleOk, sigOk, recomputed, claimed };
+}
+
+/**
+ * Batch Merkle root: unlike the daily-anchor Merkle (which hashes each leaf
+ * string), batch leaves are already SHA-256 digests, so the tree folds the raw
+ * 32-byte digests directly. Bitcoin-style duplicate-last on an odd layer.
+ */
+function batchMerkleRoot(hexLeaves) {
+  if (hexLeaves.length === 0) throw new Error("empty leaves");
+  let layer = hexLeaves.map((h) => Buffer.from(h, "hex"));
+  while (layer.length > 1) {
+    if (layer.length % 2 === 1) layer.push(layer[layer.length - 1]);
+    const next = [];
+    for (let i = 0; i < layer.length; i += 2) {
+      next.push(sha256(Buffer.concat([layer[i], layer[i + 1]])));
+    }
+    layer = next;
+  }
+  return layer[0].toString("hex");
+}
+
+/** True for the audit-batch / unified-pipeline schema (no `payload`; the
+ *  signature is an object naming the field it covers). */
+function isBatchRecord(record) {
+  return Boolean(
+    record &&
+      ((typeof record.schema === "string" && record.schema.startsWith("causallayer.audit-batch")) ||
+        (record.signature && typeof record.signature === "object" && record.signature.signed_field) ||
+        typeof record.batch_merkle_root === "string"),
+  );
+}
+
+/**
+ * Verify a batch record. Two checks are authoritative and robust:
+ *   - merkleOk: the batch Merkle root recomputes from the leaf SHA-256 digests.
+ *   - sigOk:    the Ed25519 signature verifies over the UTF-8 bytes of the
+ *               signed field (batch_body_sha256) using the published key.
+ * bodyOk is a best-effort extra: it tries to reproduce batch_body_sha256 by
+ * re-serialising the visible body. Because byte-identical JSON serialisation is
+ * not guaranteed across the original (Python) serialiser and Node, a mismatch
+ * is informational only — the signature over batch_body_sha256 is the binding
+ * authenticity check. bodyOk is true/false when checked, or null if absent.
+ */
+function verifyBatchRecord(record, pubKey) {
+  const recomputed = batchMerkleRoot((record.leaves || []).map((l) => l.sha256));
+  const claimed = record.batch_merkle_root;
+  const merkleOk = recomputed === claimed;
+
+  const sig = record.signature || {};
+  const signedField = sig.signed_field || "batch_body_sha256";
+  const signedValue = record[signedField];
+  const sigOk =
+    signedValue !== undefined &&
+    typeof sig.signature_hex === "string" &&
+    crypto.verify(null, Buffer.from(String(signedValue), "utf8"), pubKey, Buffer.from(sig.signature_hex, "hex"));
+
+  let bodyOk = null;
+  if (typeof record.batch_body_sha256 === "string") {
+    const body = { ...record };
+    delete body.batch_body_sha256;
+    delete body.signature;
+    bodyOk = sha256(Buffer.from(JSON.stringify(body, null, 2), "utf8")).toString("hex") === record.batch_body_sha256;
+  }
+  return { merkleOk, sigOk, bodyOk, recomputed, claimed, signedField };
 }
 
 function loadPublicKey(scriptDir) {
@@ -101,24 +171,51 @@ function main() {
   const anchorPath = path.resolve(file);
   const scriptDir = __dirname;
   const record = JSON.parse(fs.readFileSync(anchorPath, "utf8"));
-
-  // 1 + 2. Merkle root and Ed25519 signature
   const pubKey = loadPublicKey(scriptDir);
+
+  const otsHint = () => {
+    const otsPath = anchorPath + ".ots";
+    if (fs.existsSync(otsPath)) {
+      console.log(`ots proof    : present at ${path.basename(otsPath)}`);
+      console.log(`               run: ots verify ${otsPath}`);
+    } else {
+      console.log("ots proof    : not yet attached (anchor may be < ~3h old)");
+    }
+  };
+
+  // ── Batch / unified-pipeline schema (no `payload`) ──────────────────────────
+  if (isBatchRecord(record)) {
+    const { merkleOk, sigOk, bodyOk, recomputed, claimed, signedField } = verifyBatchRecord(record, pubKey);
+    console.log(`schema       : ${record.schema || "audit-batch"}`);
+    console.log(`merkle root  : ${merkleOk ? "OK  " : "FAIL"}  recomputed=${recomputed}`);
+    if (!merkleOk) console.log(`               claimed   =${claimed}`);
+    console.log(`ed25519 sig  : ${sigOk ? "OK  " : "FAIL"}  over ${signedField}`);
+    if (bodyOk === true) {
+      console.log(`body hash    : OK    (${signedField} reproduced from body)`);
+    } else if (bodyOk === false) {
+      console.log(`body hash    : note  ${signedField} not reproducible via JSON re-serialisation`);
+      console.log(`               (the ed25519 signature over it is the authoritative check)`);
+    }
+    otsHint();
+    console.log(`leaf count   : ${record.leaf_count}`);
+    console.log(`key fp       : ${record.signature && record.signature.pubkey_sha256_fingerprint}`);
+    process.exit(merkleOk && sigOk ? 0 : 1);
+  }
+
+  // ── Daily / cert anchor schema (`payload` object) ──────────────────────────
+  if (!record || typeof record.payload !== "object" || record.payload === null) {
+    console.error(
+      `unrecognized anchor schema in ${path.basename(anchorPath)}: ` +
+        "no `payload` object and not a recognized batch record. " +
+        "Expected a daily/cert anchor (payload + signature) or an audit-batch record.",
+    );
+    process.exit(2);
+  }
   const { merkleOk, sigOk, recomputed, claimed } = verifyAnchorRecord(record, pubKey);
   console.log(`merkle root  : ${merkleOk ? "OK  " : "FAIL"}  recomputed=${recomputed}`);
   if (!merkleOk) console.log(`               claimed   =${claimed}`);
   console.log(`ed25519 sig  : ${sigOk ? "OK  " : "FAIL"}  algo=${record.signatureAlgorithm}`);
-
-  // 3. OTS proof hint
-  const otsPath = anchorPath + ".ots";
-  if (fs.existsSync(otsPath)) {
-    console.log(`ots proof    : present at ${path.basename(otsPath)}`);
-    console.log(`               run: ots verify ${otsPath}`);
-  } else {
-    console.log("ots proof    : not yet attached (anchor may be < ~3h old)");
-  }
-
-  // 4. Anchor metadata
+  otsHint();
   console.log(`anchor date  : ${record.payload.anchorDate}`);
   console.log(`leaf count   : ${record.payload.leafCount}`);
   console.log(`key fp       : ${record.publicKeyFingerprint}`);
@@ -126,7 +223,17 @@ function main() {
   process.exit(merkleOk && sigOk ? 0 : 1);
 }
 
-module.exports = { sha256, merkleRoot, canonicalize, verifyAnchorRecord, loadPublicKey, main };
+module.exports = {
+  sha256,
+  merkleRoot,
+  canonicalize,
+  verifyAnchorRecord,
+  batchMerkleRoot,
+  isBatchRecord,
+  verifyBatchRecord,
+  loadPublicKey,
+  main,
+};
 
 // Only run the CLI when executed directly, so the pure functions above can be
 // required from tests without triggering argv parsing or process.exit.
